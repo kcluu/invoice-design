@@ -37,6 +37,12 @@ export const theme = {
     late: '#C2410C',
     muted: '#8A8A84',
   } satisfies Record<DueTone, string>,
+  summary: {
+    outstanding: { color: '#1D4E89', tint: '#F3F7FC' },
+    overdue: { color: '#C2410C', tint: '#FDF5F1' },
+    dueSoon: { color: '#B26B00', tint: '#FFFAEF' },
+    drafts: { color: '#8A8A84', tint: '#F7F7F5' },
+  },
   radius: { sm: '6px', md: '8px', lg: '10px', xl: '12px', pill: '999px' },
   font: {
     family: "Inter, system-ui, -apple-system, 'Segoe UI', sans-serif",

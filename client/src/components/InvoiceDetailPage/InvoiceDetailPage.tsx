@@ -4,13 +4,41 @@ import { useInvoice } from '../../hooks/useInvoice'
 import { useInvoiceActions } from '../../hooks/useInvoiceActions'
 import { REVENUE_ACCOUNTS, type Invoice } from '../../types/invoice'
 import { formatDate, formatTimestamp } from '../../utils/dates'
-import { displayStatus, dueInfo } from '../../utils/invoiceStatus'
+import { displayStatus, dueInfo, isOutstanding, type DueInfo } from '../../utils/invoiceStatus'
 import { availableActions } from '../../utils/invoicePermissions'
 import { computeTotals, lineAmount } from '../../utils/invoiceTotals'
 import { formatMoney, formatPercent, formatQuantity, formatUnitPrice } from '../../utils/money'
+import { Button } from '../Button/Button'
 import { ConfirmDeleteDialog } from '../ConfirmDeleteDialog/ConfirmDeleteDialog'
 import { ErrorState } from '../ErrorState/ErrorState'
 import { InvoiceDetailSkeleton } from '../InvoiceDetailSkeleton/InvoiceDetailSkeleton'
+import { StatusBadge } from '../StatusBadge/StatusBadge'
+import {
+  Actions,
+  Activity,
+  BackLink,
+  Balance,
+  Banner,
+  type BannerTone,
+  Card,
+  CardTitle,
+  Columns,
+  DetailGrid,
+  DueHint,
+  ErrorBanner,
+  Header,
+  LineTable,
+  MainColumn,
+  Meta,
+  Page,
+  SideColumn,
+  TableScroll,
+  Title,
+  TitleRow,
+  Totals,
+  TotalsRow,
+  Wide,
+} from './InvoiceDetailPage.styled'
 
 interface InvoiceDetailPageProp {
   id: string
@@ -24,6 +52,17 @@ interface InvoiceDetailPageProp {
 const accountLabel = (code: string) => {
   const account = REVENUE_ACCOUNTS.find((item) => item.code === code)
   return account ? `${code} · ${account.name}` : code
+}
+
+// one line of context at the top so the state of the invoice is obvious
+const bannerFor = (invoice: Invoice, due: DueInfo): { tone: BannerTone; text: string } | null => {
+  const status = displayStatus(invoice)
+  if (status === 'Overdue')
+    return { tone: 'late', text: `This invoice is ${due.label}. Follow up with ${invoice.customerName} or record a payment.` }
+  if (status === 'Open' && due.isDueSoon) return { tone: 'soon', text: `${due.label}. The balance is still open.` }
+  if (status === 'Draft') return { tone: 'neutral', text: 'Draft. Not sent to the customer yet, so it isn’t in AR aging.' }
+  if (status === 'Void') return { tone: 'neutral', text: 'Voided. Kept for the audit trail and excluded from AR.' }
+  return null
 }
 
 export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onDeleted }: InvoiceDetailPageProp) => {
@@ -55,115 +94,172 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onD
   const allowed = availableActions(invoice)
   const busy = actions.pending !== null
   const pendingAction = actions.pending?.action
+  const banner = bannerFor(invoice, due)
+  const balance = isOutstanding(invoice) || invoice.status === 'Draft' ? totals.total : 0
 
   return (
-    <section>
-      <button type="button" onClick={onBack}>
+    <Page>
+      <BackLink type="button" onClick={onBack}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
         All invoices
-      </button>
-      <h1>{invoice.invoiceNumber}</h1>
-      <p>
-        {displayStatus(invoice)} · {invoice.customerName} · {invoice.currency}
-      </p>
+      </BackLink>
 
-      <div>
-        {allowed.canEdit && (
-          <button type="button" onClick={() => onEdit(invoice.id)}>
-            Edit
-          </button>
-        )}
-        {allowed.canSend && (
-          <button type="button" disabled={busy} onClick={() => void actions.run(invoice, 'send')}>
-            {pendingAction === 'send' ? 'Sending…' : 'Send invoice'}
-          </button>
-        )}
-        {allowed.canRecordPayment && (
-          <button type="button" disabled={busy} onClick={() => void actions.run(invoice, 'recordPayment')}>
-            {pendingAction === 'recordPayment' ? 'Recording…' : 'Record payment'}
-          </button>
-        )}
-        {allowed.canVoid && (
-          <button type="button" disabled={busy} onClick={() => void actions.run(invoice, 'void')}>
-            {pendingAction === 'void' ? 'Voiding…' : 'Void'}
-          </button>
-        )}
-        {allowed.canDelete && (
-          <button type="button" disabled={busy} onClick={() => setConfirmingDelete(true)}>
-            Delete
-          </button>
-        )}
-      </div>
-      {actions.error && (
-        <div role="alert">
-          <p>{actions.error}</p>
-          <button type="button" onClick={actions.clearError}>
-            Dismiss
-          </button>
+      <Header>
+        <div>
+          <TitleRow>
+            <Title>{invoice.invoiceNumber}</Title>
+            <StatusBadge status={displayStatus(invoice)} />
+          </TitleRow>
+          <Meta>
+            {invoice.customerName} · {invoice.currency} · Issued {formatDate(invoice.issueDate)}
+          </Meta>
         </div>
+        <Actions>
+          {allowed.canEdit && <Button onClick={() => onEdit(invoice.id)}>Edit</Button>}
+          {allowed.canVoid && (
+            <Button disabled={busy} onClick={() => void actions.run(invoice, 'void')}>
+              {pendingAction === 'void' ? 'Voiding…' : 'Void'}
+            </Button>
+          )}
+          {allowed.canDelete && (
+            <Button variant="danger" disabled={busy} onClick={() => setConfirmingDelete(true)}>
+              Delete
+            </Button>
+          )}
+          {allowed.canSend && (
+            <Button variant="primary" disabled={busy} onClick={() => void actions.run(invoice, 'send')}>
+              {pendingAction === 'send' ? 'Sending…' : 'Send invoice'}
+            </Button>
+          )}
+          {allowed.canRecordPayment && (
+            <Button variant="primary" disabled={busy} onClick={() => void actions.run(invoice, 'recordPayment')}>
+              {pendingAction === 'recordPayment' ? 'Recording…' : 'Record payment'}
+            </Button>
+          )}
+        </Actions>
+      </Header>
+
+      {banner && (
+        <Banner $tone={banner.tone}>
+          <span>{banner.text}</span>
+        </Banner>
+      )}
+      {actions.error && (
+        <ErrorBanner role="alert">
+          <span>{actions.error}</span>
+          <Button size="sm" variant="ghost" onClick={actions.clearError}>
+            Dismiss
+          </Button>
+        </ErrorBanner>
       )}
 
-      <h2>Details</h2>
-      <dl>
-        <dt>Customer</dt>
-        <dd>{invoice.customerName}</dd>
-        <dt>Billing email</dt>
-        <dd>{invoice.billingEmail}</dd>
-        <dt>Billing address</dt>
-        <dd>{invoice.billingAddress || '—'}</dd>
-        <dt>Invoice date</dt>
-        <dd>{formatDate(invoice.issueDate)}</dd>
-        <dt>Due date</dt>
-        <dd>
-          {formatDate(invoice.dueDate)} ({due.label})
-        </dd>
-        <dt>Terms</dt>
-        <dd>{invoice.paymentTerms}</dd>
-        <dt>Memo</dt>
-        <dd>{invoice.memo || '—'}</dd>
-      </dl>
+      <Columns>
+        <MainColumn>
+          <Card>
+            <CardTitle>Details</CardTitle>
+            <DetailGrid>
+              <div>
+                <dt>Customer</dt>
+                <dd>{invoice.customerName}</dd>
+              </div>
+              <div>
+                <dt>Billing email</dt>
+                <dd>{invoice.billingEmail}</dd>
+              </div>
+              <div>
+                <dt>Billing address</dt>
+                <dd>{invoice.billingAddress || '—'}</dd>
+              </div>
+              <div>
+                <dt>Invoice date</dt>
+                <dd>{formatDate(invoice.issueDate)}</dd>
+              </div>
+              <div>
+                <dt>Due date</dt>
+                <dd>
+                  {formatDate(invoice.dueDate)} <DueHint $tone={due.tone}>· {due.label}</DueHint>
+                </dd>
+              </div>
+              <div>
+                <dt>Terms</dt>
+                <dd>{invoice.paymentTerms}</dd>
+              </div>
+              <Wide>
+                <dt>Memo</dt>
+                <dd>{invoice.memo || '—'}</dd>
+              </Wide>
+            </DetailGrid>
+          </Card>
 
-      <h2>Products</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Description</th>
-            <th>Account</th>
-            <th>Qty</th>
-            <th>Unit price</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {invoice.lineItems.map((line) => (
-            <tr key={line.id}>
-              <td>{line.description}</td>
-              <td>{accountLabel(line.accountCode)}</td>
-              <td>{formatQuantity(line.quantity)}</td>
-              <td>{formatUnitPrice(line.unitPrice, invoice.currency)}</td>
-              <td>{money(lineAmount(line))}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <dl>
-        <dt>Subtotal</dt>
-        <dd>{money(totals.subtotal)}</dd>
-        <dt>Discount</dt>
-        <dd>{money(-totals.discount)}</dd>
-        <dt>Tax ({formatPercent(invoice.taxRate)})</dt>
-        <dd>{money(totals.tax)}</dd>
-        <dt>Total</dt>
-        <dd>{money(totals.total)}</dd>
-      </dl>
+          <Card>
+            <CardTitle>Products</CardTitle>
+            <TableScroll>
+              <LineTable>
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Account</th>
+                    <th className="num">Qty</th>
+                    <th className="num">Unit price</th>
+                    <th className="num">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoice.lineItems.map((line) => (
+                    <tr key={line.id}>
+                      <td>{line.description}</td>
+                      <td>{accountLabel(line.accountCode)}</td>
+                      <td className="num">{formatQuantity(line.quantity)}</td>
+                      <td className="num">{formatUnitPrice(line.unitPrice, invoice.currency)}</td>
+                      <td className="num">{money(lineAmount(line))}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </LineTable>
+            </TableScroll>
+            <TotalsRow>
+              <Totals>
+                <dt>Subtotal</dt>
+                <dd>{money(totals.subtotal)}</dd>
+                <dt>Discount</dt>
+                <dd>{totals.discount ? `−${money(totals.discount)}` : money(0)}</dd>
+                <dt>Tax ({formatPercent(invoice.taxRate)})</dt>
+                <dd>{money(totals.tax)}</dd>
+                <dt>Total</dt>
+                <dd>{money(totals.total)}</dd>
+              </Totals>
+            </TotalsRow>
+          </Card>
+        </MainColumn>
 
-      <h2>Activity</h2>
-      <ol>
-        {[...invoice.activity].reverse().map((entry) => (
-          <li key={entry.id}>
-            {entry.action} — {entry.actor}, {formatTimestamp(entry.timestamp)}
-          </li>
-        ))}
-      </ol>
+        <SideColumn>
+          <Card>
+            <Balance>
+              <span>Balance due</span>
+              <strong>{money(balance)}</strong>
+              <DueHint $tone={due.tone}>{due.label}</DueHint>
+            </Balance>
+          </Card>
+
+          <Card>
+            <CardTitle>Activity</CardTitle>
+            <Activity>
+              {[...invoice.activity].reverse().map((entry) => (
+                <li key={entry.id}>
+                  <div>
+                    {entry.action}
+                    <small>
+                      {entry.actor} · {formatTimestamp(entry.timestamp)}
+                    </small>
+                  </div>
+                </li>
+              ))}
+            </Activity>
+          </Card>
+        </SideColumn>
+      </Columns>
 
       {confirmingDelete && (
         <ConfirmDeleteDialog
@@ -176,6 +272,6 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onD
           }}
         />
       )}
-    </section>
+    </Page>
   )
 }

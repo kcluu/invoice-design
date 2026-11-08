@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { InvoiceAction } from '../../hooks/useInvoiceActions'
 import type { Invoice } from '../../types/invoice'
 import { availableActions } from '../../utils/invoicePermissions'
+import { Divider, Menu, MenuItem, MenuNote, MenuWrap, Trigger } from './RowActionsMenu.styled'
 
 interface RowActionsMenuProp {
   invoice: Invoice
@@ -20,44 +21,49 @@ export const RowActionsMenu = ({ invoice, onView, onEdit, onAction, onRequestDel
   }
 
   return (
-    <div>
-      <button type="button" onClick={() => setOpen((value) => !value)}>
-        Actions
-      </button>
+    <MenuWrap>
+      <Trigger type="button" title="Actions" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <circle cx="5" cy="12" r="1.8" />
+          <circle cx="12" cy="12" r="1.8" />
+          <circle cx="19" cy="12" r="1.8" />
+        </svg>
+      </Trigger>
       {open && (
-        <div>
-          <button type="button" onClick={pick(onView)}>
+        <Menu>
+          <MenuItem type="button" onClick={pick(onView)}>
             View invoice
-          </button>
+          </MenuItem>
           {actions.canEdit && (
-            <button type="button" onClick={pick(onEdit)}>
+            <MenuItem type="button" onClick={pick(onEdit)}>
               Edit
-            </button>
+            </MenuItem>
           )}
           {actions.canSend && (
-            <button type="button" onClick={pick(() => onAction('send'))}>
+            <MenuItem type="button" onClick={pick(() => onAction('send'))}>
               Send
-            </button>
+            </MenuItem>
           )}
           {actions.canRecordPayment && (
-            <button type="button" onClick={pick(() => onAction('recordPayment'))}>
+            <MenuItem type="button" onClick={pick(() => onAction('recordPayment'))}>
               Record payment
-            </button>
+            </MenuItem>
           )}
           {actions.canVoid && (
-            <button type="button" onClick={pick(() => onAction('void'))}>
+            <MenuItem type="button" onClick={pick(() => onAction('void'))}>
               Void
-            </button>
+            </MenuItem>
           )}
+          <Divider />
           {actions.canDelete ? (
-            <button type="button" onClick={pick(onRequestDelete)}>
+            <MenuItem type="button" $danger onClick={pick(onRequestDelete)}>
               Delete
-            </button>
+            </MenuItem>
           ) : (
-            <p>Paid invoices can’t be deleted. Reverse the payment first.</p>
+            <MenuNote>Paid invoices can’t be deleted. Reverse the payment first.</MenuNote>
           )}
-        </div>
+        </Menu>
       )}
-    </div>
+    </MenuWrap>
   )
 }

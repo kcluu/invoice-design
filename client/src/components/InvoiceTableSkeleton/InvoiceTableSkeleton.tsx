@@ -1,4 +1,5 @@
 import { Skeleton } from '../Skeleton/Skeleton'
+import { Cell, Table, Wrap } from './InvoiceTableSkeleton.styled'
 
 interface InvoiceTableSkeletonProp {
   rows?: number
@@ -8,33 +9,39 @@ interface InvoiceTableSkeletonProp {
 const widths = ['62%', '48%', '70%', '55%', '66%']
 
 export const InvoiceTableSkeleton = ({ rows = 5 }: InvoiceTableSkeletonProp) => (
-  <div aria-busy="true" aria-label="Loading invoices">
-    <table>
+  <Wrap aria-busy="true" aria-label="Loading invoices">
+    <Table>
       <tbody>
         {Array.from({ length: rows }, (_, index) => (
           <tr key={index}>
-            <td>
+            <Cell>
               <Skeleton width="110px" />
               <Skeleton width={widths[index % widths.length]} height={8} />
-            </td>
-            <td>
+            </Cell>
+            <Cell>
               <Skeleton width="120px" />
-            </td>
-            <td>
+              <Skeleton width="60px" height={8} />
+            </Cell>
+            <Cell>
               <Skeleton width="84px" />
-            </td>
-            <td>
+            </Cell>
+            <Cell>
               <Skeleton width="96px" />
-            </td>
-            <td>
+              <Skeleton width="70px" height={8} />
+            </Cell>
+            <Cell>
               <Skeleton width="64px" height={20} />
-            </td>
-            <td>
+            </Cell>
+            <Cell>
               <Skeleton width="90px" />
-            </td>
+              <Skeleton width="60px" height={8} />
+            </Cell>
+            <Cell>
+              <Skeleton width="20px" height={6} />
+            </Cell>
           </tr>
         ))}
       </tbody>
-    </table>
-  </div>
+    </Table>
+  </Wrap>
 )

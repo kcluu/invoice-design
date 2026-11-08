@@ -3,6 +3,7 @@ import type { Invoice } from '../../types/invoice'
 import { computeTotals } from '../../utils/invoiceTotals'
 import { formatMoneyByCurrency } from '../../utils/money'
 import { Skeleton } from '../Skeleton/Skeleton'
+import { Amount, Card, CardTop, Dot, Grid, Hint, Label, Sub } from './SummaryCards.styled'
 
 interface SummaryCardsProp {
   groups: { outstanding: Invoice[]; overdue: Invoice[]; dueSoon: Invoice[]; drafts: Invoice[] }
@@ -11,23 +12,35 @@ interface SummaryCardsProp {
   onSelect: (filter: InvoiceFilter) => void
 }
 
+export const SUMMARY_CARDS = [
+  { filter: 'outstanding', label: 'Outstanding', group: 'outstanding', empty: 'No open invoices' },
+  { filter: 'Overdue', label: 'Overdue', group: 'overdue', empty: 'Nothing past due' },
+  { filter: 'dueSoon', label: 'Due in next 14 days', group: 'dueSoon', empty: 'Nothing due soon' },
+  { filter: 'Draft', label: 'Drafts to send', group: 'drafts', empty: 'No drafts' },
+] as const
+
 const amountOf = (invoices: Invoice[]) =>
   formatMoneyByCurrency(invoices.map((invoice) => ({ amount: computeTotals(invoice).total, currency: invoice.currency })))
 
-export const SummaryCards = ({ groups, activeFilter, loading, onSelect }: SummaryCardsProp) => {
-  const cards: Array<{ filter: InvoiceFilter; label: string; invoices: Invoice[] }> = [
-    { filter: 'outstanding', label: 'Outstanding', invoices: groups.outstanding },
-    { filter: 'Overdue', label: 'Overdue', invoices: groups.overdue },
-    { filter: 'dueSoon', label: 'Due in next 14 days', invoices: groups.dueSoon },
-    { filter: 'Draft', label: 'Drafts to send', invoices: groups.drafts },
-  ]
+const countLabel = (count: number) => `${count} invoice${count === 1 ? '' : 's'}`
 
-  return (
-    <div>
-      {cards.map((card) => (
+export const SummaryCards = ({ groups, activeFilter, loading, onSelect }: SummaryCardsProp) => (
+  <Grid>
+    {SUMMARY_CARDS.map((card) => {
+      const invoices = groups[card.group]
+      const active = activeFilter === card.filter
+      return (
         // clicking the active card again clears the filter
-        <button key={card.filter} type="button" onClick={() => onSelect(activeFilter === card.filter ? 'all' : card.filter)}>
-          <span>{card.label}</span>
+        <Card key={card.filter} type="button" $active={active} $tone={card.group} onClick={() => onSelect(active ? 'all' : card.filter)}>
+          <CardTop>
+            <Label>
+              <Dot $tone={card.group} />
+              {card.label}
+            </Label>
+            <Hint $active={active} $tone={card.group}>
+              {active ? 'Showing' : 'View'}
+            </Hint>
+          </CardTop>
           {loading ? (
             <>
               <Skeleton width="60%" height={18} />
@@ -35,12 +48,12 @@ export const SummaryCards = ({ groups, activeFilter, loading, onSelect }: Summar
             </>
           ) : (
             <>
-              <strong>{amountOf(card.invoices)}</strong>
-              <span>{card.invoices.length} invoices</span>
+              <Amount>{amountOf(invoices)}</Amount>
+              <Sub>{invoices.length ? countLabel(invoices.length) : card.empty}</Sub>
             </>
           )}
-        </button>
-      ))}
-    </div>
-  )
-}
+        </Card>
+      )
+    })}
+  </Grid>
+)

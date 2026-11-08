@@ -2,6 +2,8 @@ import type { Invoice } from '../../types/invoice'
 import { displayStatus } from '../../utils/invoiceStatus'
 import { computeTotals } from '../../utils/invoiceTotals'
 import { formatMoney } from '../../utils/money'
+import { Button } from '../Button/Button'
+import { Backdrop, Body, FinePrint, Footer, Panel, Summary, Title } from './ConfirmDeleteDialog.styled'
 
 interface ConfirmDeleteDialogProp {
   invoice: Invoice
@@ -22,24 +24,29 @@ export const ConfirmDeleteDialog = ({ invoice, busy, onCancel, onConfirm, onVoid
   const canVoid = invoice.status === 'Sent'
 
   return (
-    <div role="dialog">
-      <h2>Delete {invoice.invoiceNumber}?</h2>
-      <p>{deleteMessage(invoice)}</p>
-      <p>
-        {invoice.customerName} · {formatMoney(computeTotals(invoice).total, invoice.currency)}
-      </p>
-      <p>This can’t be undone.</p>
-      <button type="button" onClick={onCancel} disabled={busy}>
-        Cancel
-      </button>
-      {canVoid && (
-        <button type="button" onClick={onVoidInstead} disabled={busy}>
-          Void instead
-        </button>
-      )}
-      <button type="button" onClick={onConfirm} disabled={busy}>
-        {busy ? 'Deleting…' : 'Delete invoice'}
-      </button>
-    </div>
+    <Backdrop>
+      <Panel role="dialog">
+        <Title>Delete {invoice.invoiceNumber}?</Title>
+        <Body>{deleteMessage(invoice)}</Body>
+        <Summary>
+          <span>{invoice.customerName}</span>
+          <strong>{formatMoney(computeTotals(invoice).total, invoice.currency)}</strong>
+        </Summary>
+        <FinePrint>This can’t be undone. The deletion is kept in the audit trail.</FinePrint>
+        <Footer>
+          <Button onClick={onCancel} disabled={busy}>
+            Cancel
+          </Button>
+          {canVoid && (
+            <Button onClick={onVoidInstead} disabled={busy}>
+              Void instead
+            </Button>
+          )}
+          <Button variant="danger" onClick={onConfirm} disabled={busy}>
+            {busy ? 'Deleting…' : 'Delete invoice'}
+          </Button>
+        </Footer>
+      </Panel>
+    </Backdrop>
   )
 }

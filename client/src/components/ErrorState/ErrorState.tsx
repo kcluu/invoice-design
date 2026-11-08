@@ -1,3 +1,6 @@
+import { Button } from '../Button/Button'
+import { Actions, Message, Panel, Title } from './ErrorState.styled'
+
 interface ErrorStateProp {
   title: string
   message: string
@@ -8,14 +11,12 @@ interface ErrorStateProp {
 
 // full-panel error for when a page's data couldn't load at all
 export const ErrorState = ({ title, message, onRetry, backHref, backLabel = 'Back to invoices' }: ErrorStateProp) => (
-  <div role="alert">
-    <h2>{title}</h2>
-    <p>{message}</p>
-    {onRetry && (
-      <button type="button" onClick={onRetry}>
-        Try again
-      </button>
-    )}
-    {backHref && <a href={backHref}>{backLabel}</a>}
-  </div>
+  <Panel role="alert">
+    <Title>{title}</Title>
+    <Message>{message}</Message>
+    <Actions>
+      {onRetry && <Button onClick={onRetry}>Try again</Button>}
+      {backHref && <a href={backHref}>{backLabel}</a>}
+    </Actions>
+  </Panel>
 )
