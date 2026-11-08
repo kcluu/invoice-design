@@ -111,6 +111,10 @@ export const Field = styled.label<{ $wide?: boolean }>`
   }
 `
 
+export const Required = styled.span`
+  color: ${({ theme }) => theme.color.danger};
+`
+
 export const Hint = styled.span`
   font-weight: 400;
   color: ${({ theme }) => theme.color.textMuted};

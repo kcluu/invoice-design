@@ -33,6 +33,17 @@ describe('InvoiceForm', () => {
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
+  it('moves focus to the summary and lets each entry jump to its field', async () => {
+    const user = userEvent.setup()
+    renderForm()
+    await user.click(screen.getByRole('button', { name: 'Save as draft' }))
+
+    const summary = screen.getByRole('alert')
+    expect(summary).toHaveFocus()
+    await user.click(within(summary).getByRole('button', { name: /^Billing email/ }))
+    expect(screen.getByLabelText(/Billing email/)).toHaveFocus()
+  })
+
   it('shows field errors the api sends back', async () => {
     fetchMock.mockResolvedValueOnce(
       jsonResponse({ error: 'invoice has invalid fields', fields: { billingEmail: 'must be a valid email address' } }, 422)
@@ -42,8 +53,8 @@ describe('InvoiceForm', () => {
 
     await user.type(screen.getByLabelText(/Customer/), 'Acme Labs')
     await user.type(screen.getByLabelText(/Billing email/), 'ap@acmelabs.example')
-    await user.type(screen.getAllByRole('textbox').find((input) => input.closest('td'))!, 'Platform subscription')
-    await user.type(screen.getAllByRole('spinbutton').filter((input) => input.closest('td'))[1], '12000')
+    await user.type(screen.getByLabelText('Description, line 1'), 'Platform subscription')
+    await user.type(screen.getByLabelText('Unit price, line 1'), '12000')
     await user.click(screen.getByRole('button', { name: 'Save as draft' }))
 
     // shown inline and in the summary

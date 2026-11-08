@@ -8,9 +8,18 @@ export type InvoiceAction = 'send' | 'recordPayment' | 'void' | 'delete'
 interface UseInvoiceActionsOptions {
   onUpdated: (invoice: Invoice) => void
   onDeleted: (invoice: Invoice) => void
+  onNotify?: (message: string) => void
 }
 
-export const useInvoiceActions = ({ onUpdated, onDeleted }: UseInvoiceActionsOptions) => {
+const successMessage = (invoice: Invoice, action: InvoiceAction) =>
+  ({
+    send: `${invoice.invoiceNumber} sent to ${invoice.billingEmail}`,
+    recordPayment: `Payment recorded on ${invoice.invoiceNumber}`,
+    void: `${invoice.invoiceNumber} voided`,
+    delete: `${invoice.invoiceNumber} deleted`,
+  })[action]
+
+export const useInvoiceActions = ({ onUpdated, onDeleted, onNotify }: UseInvoiceActionsOptions) => {
   const [pending, setPending] = useState<{ id: string; action: InvoiceAction } | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -26,6 +35,7 @@ export const useInvoiceActions = ({ onUpdated, onDeleted }: UseInvoiceActionsOpt
           const call = { send: invoicesApi.send, recordPayment: invoicesApi.recordPayment, void: invoicesApi.void }[action]
           onUpdated(await call(invoice.id))
         }
+        onNotify?.(successMessage(invoice, action))
         return true
       } catch (err) {
         setError(errorMessage(err, 'That didn’t work. Try again.'))
@@ -34,7 +44,7 @@ export const useInvoiceActions = ({ onUpdated, onDeleted }: UseInvoiceActionsOpt
         setPending(null)
       }
     },
-    [onUpdated, onDeleted]
+    [onUpdated, onDeleted, onNotify]
   )
 
   return { run, pending, error, clearError: () => setError(null) }

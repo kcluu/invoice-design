@@ -1,11 +1,13 @@
 import { useMemo, type ReactNode } from 'react'
 import { AppShell } from './components/AppShell/AppShell'
+import { Toast } from './components/Toast/Toast'
 import { InvoiceDetailPage } from './components/InvoiceDetailPage/InvoiceDetailPage'
 import { InvoiceFormPage } from './components/InvoiceFormPage/InvoiceFormPage'
 import { InvoiceListPage } from './components/InvoiceListPage/InvoiceListPage'
 import { paths, useHashRoute } from './hooks/useHashRoute'
 import { useInvoices } from './hooks/useInvoices'
 import { useMeta } from './hooks/useMeta'
+import { useToast } from './hooks/useToast'
 import type { Invoice } from './types/invoice'
 import { deriveCustomers } from './utils/customers'
 
@@ -14,9 +16,11 @@ export const App = () => {
   const meta = useMeta()
   const { invoices, status, error, reload, upsertInvoice, removeInvoice } = useInvoices()
   const customers = useMemo(() => deriveCustomers(invoices), [invoices])
+  const toast = useToast()
 
   const handleSaved = (invoice: Invoice) => {
     upsertInvoice(invoice)
+    toast.notify(`${invoice.invoiceNumber} saved`)
     navigate(paths.detail(invoice.id))
   }
 
@@ -64,6 +68,7 @@ export const App = () => {
           onEdit={(id) => navigate(paths.edit(id))}
           onUpdated={upsertInvoice}
           onDeleted={handleDeleted}
+          onNotify={toast.notify}
         />
       )
       break
@@ -80,6 +85,7 @@ export const App = () => {
           onRetry={() => void reload()}
           onUpdated={upsertInvoice}
           onDeleted={handleDeleted}
+          onNotify={toast.notify}
         />
       )
   }
@@ -87,6 +93,7 @@ export const App = () => {
   return (
     <AppShell companyName={meta.companyName} asOfDate={meta.asOfDate} breadcrumbs={breadcrumbs}>
       {page}
+      <Toast message={toast.message} onDismiss={toast.dismiss} />
     </AppShell>
   )
 }

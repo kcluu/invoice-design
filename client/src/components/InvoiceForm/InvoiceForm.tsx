@@ -1,14 +1,17 @@
+import { useState } from 'react'
 import { useFocusOnReady } from '../../hooks/useFocusOnReady'
 import { useInvoiceForm, type InvoiceFormValues } from '../../hooks/useInvoiceForm'
 import { useSaveInvoice } from '../../hooks/useSaveInvoice'
 import { CURRENCIES, PAYMENT_TERMS, type Invoice, type PaymentTerms } from '../../types/invoice'
 import type { CustomerProfile } from '../../utils/customers'
+import { fieldId } from '../../utils/fieldId'
 import { availableActions } from '../../utils/invoicePermissions'
 import { formatMoney } from '../../utils/money'
 import { Button } from '../Button/Button'
 import { ErrorSummary } from '../ErrorSummary/ErrorSummary'
 import { FieldError } from '../FieldError/FieldError'
 import { LineItemsEditor } from '../LineItemsEditor/LineItemsEditor'
+import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden'
 import {
   Card,
   CardTitle,
@@ -19,6 +22,7 @@ import {
   Form,
   Hint,
   Note,
+  Required,
   Subtitle,
   Title,
   Totals,
@@ -41,19 +45,32 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
   const headingRef = useFocusOnReady<HTMLHeadingElement>(true)
   const money = (amount: number) => formatMoney(amount, values.currency)
 
-  // wires an input to its inline error message
-  const errorProps = (key: string) => ({
+  // counts failed save attempts so the error summary can take focus each time
+  const [failedAttempts, setFailedAttempts] = useState(0)
+
+  // ties an input to its id, required state, hint and inline error
+  const fieldProps = (key: string, { required = false, hintId }: { required?: boolean; hintId?: string } = {}) => ({
+    id: fieldId(key),
+    'aria-required': required || undefined,
     'aria-invalid': errors[key] ? true : undefined,
-    'aria-describedby': errors[key] ? `${key}-error` : undefined,
+    'aria-describedby': [errors[key] ? `${key}-error` : null, hintId].filter(Boolean).join(' ') || undefined,
   })
 
   const submit = async (send: boolean) => {
-    if (saving || !form.validate()) return
+    if (saving) return
+    if (!form.validate()) {
+      setFailedAttempts((count) => count + 1)
+      return
+    }
     const result = invoice
       ? await save({ mode: 'edit', invoice, input: form.input })
       : await save({ mode: 'create', input: form.input, send })
-    if (result.ok) onSaved(result.invoice)
-    else form.applyServerErrors(result.fieldErrors)
+    if (result.ok) {
+      onSaved(result.invoice)
+      return
+    }
+    form.applyServerErrors(result.fieldErrors)
+    if (Object.keys(result.fieldErrors).length) setFailedAttempts((count) => count + 1)
   }
 
   return (
@@ -73,6 +90,11 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
         </Subtitle>
       </div>
 
+      <Hint>
+        Fields marked <Required aria-hidden="true">*</Required>
+        <VisuallyHidden>with an asterisk</VisuallyHidden> are required.
+      </Hint>
+
       {locked && (
         <Note>
           This invoice was already sent. You can change the dates, terms and memo. Customer, currency, tax and products are locked so posted
@@ -80,19 +102,25 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
         </Note>
       )}
       {error && <ErrorBanner role="alert">{error}</ErrorBanner>}
-      <ErrorSummary messages={form.errorSummary} />
+      <ErrorSummary
+        items={form.errorSummary}
+        focusSignal={failedAttempts}
+        onSelect={(key) => document.getElementById(fieldId(key))?.focus()}
+      />
 
       <Card>
         <CardTitle>Details</CardTitle>
         <FieldGrid>
           <Field>
-            Customer
+            <span>
+              Customer <Required aria-hidden="true">*</Required>
+            </span>
             <input
               list="customer-options"
               value={values.customerName}
               disabled={locked}
               onChange={(event) => setField('customerName', event.target.value)}
-              {...errorProps('customerName')}
+              {...fieldProps('customerName', { required: true })}
             />
             <datalist id="customer-options">
               {customers.map((customer) => (
@@ -102,53 +130,73 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
             <FieldError id="customerName-error" message={errors.customerName} />
           </Field>
           <Field>
-            Billing email
+            <span>
+              Billing email <Required aria-hidden="true">*</Required>
+            </span>
             <input
               type="email"
               value={values.billingEmail}
               disabled={locked}
               onChange={(event) => setField('billingEmail', event.target.value)}
-              {...errorProps('billingEmail')}
+              {...fieldProps('billingEmail', { required: true })}
             />
             <FieldError id="billingEmail-error" message={errors.billingEmail} />
           </Field>
           <Field>
             Billing address
-            <input value={values.billingAddress} disabled={locked} onChange={(event) => setField('billingAddress', event.target.value)} />
+            <input
+              id={fieldId('billingAddress')}
+              value={values.billingAddress}
+              disabled={locked}
+              onChange={(event) => setField('billingAddress', event.target.value)}
+            />
           </Field>
           <Field>
             Currency
-            <select value={values.currency} disabled={locked} onChange={(event) => setField('currency', event.target.value)}>
+            <select
+              id={fieldId('currency')}
+              value={values.currency}
+              disabled={locked}
+              onChange={(event) => setField('currency', event.target.value)}
+            >
               {CURRENCIES.map((currency) => (
                 <option key={currency}>{currency}</option>
               ))}
             </select>
           </Field>
           <Field>
-            Invoice date
+            <span>
+              Invoice date <Required aria-hidden="true">*</Required>
+            </span>
             <input
               type="date"
               value={values.issueDate}
               onChange={(event) => setField('issueDate', event.target.value)}
-              {...errorProps('issueDate')}
+              {...fieldProps('issueDate', { required: true })}
             />
             <FieldError id="issueDate-error" message={errors.issueDate} />
           </Field>
           <Field>
             Terms
-            <select value={values.paymentTerms} onChange={(event) => setField('paymentTerms', event.target.value as PaymentTerms)}>
+            <select
+              id={fieldId('paymentTerms')}
+              value={values.paymentTerms}
+              onChange={(event) => setField('paymentTerms', event.target.value as PaymentTerms)}
+            >
               {PAYMENT_TERMS.map((terms) => (
                 <option key={terms}>{terms}</option>
               ))}
             </select>
           </Field>
           <Field>
-            Due date
+            <span>
+              Due date <Required aria-hidden="true">*</Required>
+            </span>
             <input
               type="date"
               value={values.dueDate}
               onChange={(event) => setField('dueDate', event.target.value)}
-              {...errorProps('dueDate')}
+              {...fieldProps('dueDate', { required: true })}
             />
             <FieldError id="dueDate-error" message={errors.dueDate} />
           </Field>
@@ -161,7 +209,7 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
               value={values.taxPercent}
               disabled={locked}
               onChange={(event) => setField('taxPercent', event.target.value)}
-              {...errorProps('taxRate')}
+              {...fieldProps('taxRate')}
             />
             <FieldError id="taxRate-error" message={errors.taxRate} />
           </Field>
@@ -173,15 +221,20 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
               value={values.discount}
               disabled={locked}
               onChange={(event) => setField('discount', event.target.value)}
-              {...errorProps('discount')}
+              {...fieldProps('discount')}
             />
             <FieldError id="discount-error" message={errors.discount} />
           </Field>
           <Field $wide>
             <span>
-              Memo <Hint>· {values.memo.length}/250</Hint>
+              Memo <Hint id="memo-count">· {values.memo.length}/250 characters</Hint>
             </span>
-            <input maxLength={250} value={values.memo} onChange={(event) => setField('memo', event.target.value)} {...errorProps('memo')} />
+            <input
+              maxLength={250}
+              value={values.memo}
+              onChange={(event) => setField('memo', event.target.value)}
+              {...fieldProps('memo', { hintId: 'memo-count' })}
+            />
             <FieldError id="memo-error" message={errors.memo} />
           </Field>
         </FieldGrid>

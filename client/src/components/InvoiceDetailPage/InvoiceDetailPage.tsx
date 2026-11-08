@@ -48,6 +48,7 @@ interface InvoiceDetailPageProp {
   onEdit: (id: string) => void
   onUpdated: (invoice: Invoice) => void
   onDeleted: (invoice: Invoice) => void
+  onNotify: (message: string) => void
 }
 
 const accountLabel = (code: string) => {
@@ -66,7 +67,7 @@ const bannerFor = (invoice: Invoice, due: DueInfo): { tone: BannerTone; text: st
   return null
 }
 
-export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onDeleted }: InvoiceDetailPageProp) => {
+export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onDeleted, onNotify }: InvoiceDetailPageProp) => {
   const { invoice, status, error, setInvoice, reload } = useInvoice(id)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const headingRef = useFocusOnReady<HTMLHeadingElement>(status === 'success')
@@ -76,6 +77,7 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onD
       onUpdated(updated)
     },
     onDeleted,
+    onNotify,
   })
 
   if (status === 'loading') return <InvoiceDetailSkeleton />

@@ -9,9 +9,25 @@ export const Box = styled.div`
   border: 1px solid ${({ theme }) => theme.color.dangerBorder};
   color: #8a2418;
 
+  &:focus {
+    outline: 2px solid ${({ theme }) => theme.color.danger};
+    outline-offset: 2px;
+  }
+
   svg {
     flex: none;
     margin-top: 2px;
+  }
+`
+
+export const SummaryLink = styled.button`
+  all: unset;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover {
+    text-decoration-thickness: 2px;
   }
 `
 

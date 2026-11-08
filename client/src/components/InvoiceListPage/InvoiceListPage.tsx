@@ -36,6 +36,7 @@ interface InvoiceListPageProp {
   onRetry: () => void
   onUpdated: (invoice: Invoice) => void
   onDeleted: (invoice: Invoice) => void
+  onNotify: (message: string) => void
 }
 
 // the two summary views with no matching tab get a short explanation above the table
@@ -55,9 +56,10 @@ export const InvoiceListPage = ({
   onRetry,
   onUpdated,
   onDeleted,
+  onNotify,
 }: InvoiceListPageProp) => {
   const { filter, setFilter, query, setQuery, visible, counts, groups } = useInvoiceFilters(invoices, asOfDate)
-  const actions = useInvoiceActions({ onUpdated, onDeleted })
+  const actions = useInvoiceActions({ onUpdated, onDeleted, onNotify })
   const [deleting, setDeleting] = useState<Invoice | null>(null)
   const focus = filter === 'outstanding' || filter === 'dueSoon' ? FOCUS_NOTES[filter] : null
   const viewLabel = focus?.label ?? STATUS_TABS.find((tab) => tab.value === filter)?.label ?? 'All'

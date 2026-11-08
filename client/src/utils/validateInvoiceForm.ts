@@ -69,4 +69,7 @@ export const labelForField = (key: string) => {
 
 // one readable line per error for the summary at the top of the form
 export const summarizeErrors = (errors: FieldErrors) =>
-  Object.entries(errors).map(([key, message]) => `${labelForField(key)}: ${message.charAt(0).toLowerCase()}${message.slice(1)}`)
+  Object.entries(errors).map(([key, message]) => ({
+    key,
+    text: `${labelForField(key)}: ${message.charAt(0).toLowerCase()}${message.slice(1)}`,
+  }))

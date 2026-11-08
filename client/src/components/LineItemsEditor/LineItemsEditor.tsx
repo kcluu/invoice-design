@@ -1,9 +1,11 @@
 import type { LineDraft } from '../../hooks/useInvoiceForm'
 import { REVENUE_ACCOUNTS, type FieldErrors } from '../../types/invoice'
+import { fieldId } from '../../utils/fieldId'
 import { lineAmount } from '../../utils/invoiceTotals'
 import { formatMoney } from '../../utils/money'
 import { Button } from '../Button/Button'
 import { FieldError } from '../FieldError/FieldError'
+import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden'
 import { AddRow, Amount, RemoveButton, Table, TableScroll, Td, Th, Wrap } from './LineItemsEditor.styled'
 
 type LineField = 'description' | 'quantity' | 'unitPrice' | 'accountCode'
@@ -18,6 +20,13 @@ interface LineItemsEditorProp {
   onRemove: (key: string) => void
 }
 
+const LINE_LABELS: Record<LineField, string> = {
+  description: 'Description',
+  accountCode: 'Revenue account',
+  quantity: 'Quantity',
+  unitPrice: 'Unit price',
+}
+
 const amountOf = (line: LineDraft) => lineAmount({ quantity: Number(line.quantity) || 0, unitPrice: Number(line.unitPrice) || 0 })
 
 export const LineItemsEditor = ({ lines, currency, disabled, errors, onChange, onAdd, onRemove }: LineItemsEditorProp) => {
@@ -25,6 +34,10 @@ export const LineItemsEditor = ({ lines, currency, disabled, errors, onChange, o
   const fieldProps = (index: number, field: LineField) => {
     const key = `lineItems.${index}.${field}`
     return {
+      id: fieldId(key),
+      // the column header isn't a label, so name each input with its line number
+      'aria-label': `${LINE_LABELS[field]}, line ${index + 1}`,
+      'aria-required': field === 'accountCode' ? undefined : true,
       'aria-invalid': errors[key] ? true : undefined,
       'aria-describedby': errors[key] ? `${key}-error` : undefined,
     }
@@ -40,14 +53,22 @@ export const LineItemsEditor = ({ lines, currency, disabled, errors, onChange, o
         <Table>
           <thead>
             <tr>
-              <Th>Description</Th>
-              <Th $width="150px">Revenue account</Th>
-              <Th $width="110px">Qty</Th>
-              <Th $width="130px">Unit price</Th>
-              <Th $width="130px" $align="right">
+              <Th scope="col">Description</Th>
+              <Th scope="col" $width="150px">
+                Revenue account
+              </Th>
+              <Th scope="col" $width="110px">
+                Qty
+              </Th>
+              <Th scope="col" $width="130px">
+                Unit price
+              </Th>
+              <Th scope="col" $width="130px" $align="right">
                 Amount
               </Th>
-              <Th $width="48px" />
+              <Th $width="48px">
+                <VisuallyHidden>Remove</VisuallyHidden>
+              </Th>
             </tr>
           </thead>
           <tbody>
@@ -65,6 +86,7 @@ export const LineItemsEditor = ({ lines, currency, disabled, errors, onChange, o
                 </Td>
                 <Td>
                   <select
+                    {...fieldProps(index, 'accountCode')}
                     value={line.accountCode}
                     disabled={disabled}
                     onChange={(event) => onChange(line.key, 'accountCode', event.target.value)}
@@ -102,7 +124,7 @@ export const LineItemsEditor = ({ lines, currency, disabled, errors, onChange, o
                 </Td>
                 <Td>
                   {!disabled && lines.length > 1 && (
-                    <RemoveButton type="button" title="Remove" onClick={() => onRemove(line.key)}>
+                    <RemoveButton type="button" aria-label={`Remove line ${index + 1}`} onClick={() => onRemove(line.key)}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                         <path d="M6 6l12 12M18 6L6 18" />
                       </svg>

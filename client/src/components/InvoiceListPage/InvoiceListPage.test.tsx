@@ -34,6 +34,7 @@ const renderPage = (overrides: Partial<Parameters<typeof InvoiceListPage>[0]> = 
     onRetry: vi.fn(),
     onUpdated: vi.fn(),
     onDeleted: vi.fn(),
+    onNotify: vi.fn(),
     ...overrides,
   }
   renderWithTheme(<InvoiceListPage {...props} />)
@@ -88,6 +89,7 @@ describe('InvoiceListPage', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Delete invoice' }))
 
     await waitFor(() => expect(props.onDeleted).toHaveBeenCalledWith(brightline))
+    expect(props.onNotify).toHaveBeenCalledWith('INV-2026-0413 deleted')
     expect(fetchMock).toHaveBeenCalledWith(`/api/invoices/${brightline.id}`, expect.objectContaining({ method: 'DELETE' }))
   })
 })

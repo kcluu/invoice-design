@@ -1,4 +1,5 @@
 import { Skeleton } from '../Skeleton/Skeleton'
+import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden'
 import { Cell, Table, Wrap } from './InvoiceTableSkeleton.styled'
 
 interface InvoiceTableSkeletonProp {
@@ -9,8 +10,9 @@ interface InvoiceTableSkeletonProp {
 const widths = ['62%', '48%', '70%', '55%', '66%']
 
 export const InvoiceTableSkeleton = ({ rows = 5 }: InvoiceTableSkeletonProp) => (
-  <Wrap aria-busy="true" aria-label="Loading invoices">
-    <Table>
+  <Wrap role="status">
+    <VisuallyHidden>Loading invoices…</VisuallyHidden>
+    <Table aria-hidden="true">
       <tbody>
         {Array.from({ length: rows }, (_, index) => (
           <tr key={index}>

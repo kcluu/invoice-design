@@ -1,22 +1,38 @@
-import { Box, Content, List } from './ErrorSummary.styled'
+import { useEffect, useId, useRef } from 'react'
+import { Box, Content, List, SummaryLink } from './ErrorSummary.styled'
 
 interface ErrorSummaryProp {
-  messages: string[]
+  items: Array<{ key: string; text: string }>
+  // bump this after a failed save to pull focus to the summary
+  focusSignal: number
+  onSelect: (key: string) => void
 }
 
-export const ErrorSummary = ({ messages }: ErrorSummaryProp) => {
-  if (!messages.length) return null
+export const ErrorSummary = ({ items, focusSignal, onSelect }: ErrorSummaryProp) => {
+  const ref = useRef<HTMLDivElement>(null)
+  const titleId = useId()
+  const hasItems = items.length > 0
+
+  useEffect(() => {
+    if (focusSignal > 0 && hasItems) ref.current?.focus()
+  }, [focusSignal, hasItems])
+
+  if (!hasItems) return null
   return (
-    <Box role="alert">
+    <Box ref={ref} role="alert" tabIndex={-1} aria-labelledby={titleId}>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
         <circle cx="12" cy="12" r="9" />
         <path d="M12 7v6M12 16.5v.5" />
       </svg>
       <Content>
-        <strong>Fix these before saving</strong>
+        <strong id={titleId}>Fix these before saving</strong>
         <List>
-          {messages.map((message) => (
-            <li key={message}>{message}</li>
+          {items.map((item) => (
+            <li key={item.key}>
+              <SummaryLink type="button" onClick={() => onSelect(item.key)}>
+                {item.text}
+              </SummaryLink>
+            </li>
           ))}
         </List>
       </Content>

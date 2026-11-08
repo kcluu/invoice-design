@@ -1,8 +1,10 @@
 import { Skeleton } from '../Skeleton/Skeleton'
+import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden'
 import { Buttons, Card, Columns, FieldGrid, Group, HeaderRow, Stack } from './InvoiceDetailSkeleton.styled'
 
 export const InvoiceDetailSkeleton = () => (
-  <Stack aria-busy="true" aria-label="Loading invoice">
+  <Stack role="status">
+    <VisuallyHidden>Loading invoice…</VisuallyHidden>
     <Skeleton width="96px" />
     <HeaderRow>
       <Group>

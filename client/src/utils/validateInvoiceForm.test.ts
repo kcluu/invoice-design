@@ -36,6 +36,6 @@ describe('validateInvoiceForm', () => {
 
   it('writes a readable summary line per error', () => {
     const summary = summarizeErrors({ 'lineItems.1.unitPrice': 'Enter a unit price of 0 or more.' })
-    expect(summary).toEqual(['Product line 2 unit price: enter a unit price of 0 or more.'])
+    expect(summary).toEqual([{ key: 'lineItems.1.unitPrice', text: 'Product line 2 unit price: enter a unit price of 0 or more.' }])
   })
 })
