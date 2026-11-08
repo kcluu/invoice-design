@@ -1,8 +1,9 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { buildInvoice } from '../../test/factories'
 import { jsonResponse, mockFetch } from '../../test/fetchMock'
+import { renderWithTheme } from '../../test/render'
 import { InvoiceListPage } from './InvoiceListPage'
 
 const AS_OF = '2026-05-04'
@@ -35,7 +36,7 @@ const renderPage = (overrides: Partial<Parameters<typeof InvoiceListPage>[0]> = 
     onDeleted: vi.fn(),
     ...overrides,
   }
-  render(<InvoiceListPage {...props} />)
+  renderWithTheme(<InvoiceListPage {...props} />)
   return props
 }
 

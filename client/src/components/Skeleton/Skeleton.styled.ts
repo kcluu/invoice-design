@@ -10,7 +10,7 @@ export const Bar = styled.span<{ $width: string; $height: number; $radius: strin
   width: ${({ $width }) => $width};
   height: ${({ $height }) => $height}px;
   border-radius: ${({ $radius }) => $radius};
-  background: #e9e9e5;
+  background: ${({ theme }) => theme.color.skeleton};
   animation: ${pulse} 1.4s ease-in-out infinite;
 
   @media (prefers-reduced-motion: reduce) {

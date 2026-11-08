@@ -1,13 +1,16 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { emptyForm } from '../../hooks/useInvoiceForm'
 import { jsonResponse, mockFetch } from '../../test/fetchMock'
+import { renderWithTheme } from '../../test/render'
 import { InvoiceForm } from './InvoiceForm'
 
 const renderForm = () => {
   const onSaved = vi.fn()
-  render(<InvoiceForm invoice={null} initialValues={emptyForm('2026-05-04')} customers={[]} onSaved={onSaved} onCancel={vi.fn()} />)
+  renderWithTheme(
+    <InvoiceForm invoice={null} initialValues={emptyForm('2026-05-04')} customers={[]} onSaved={onSaved} onCancel={vi.fn()} />
+  )
   return { onSaved }
 }
 

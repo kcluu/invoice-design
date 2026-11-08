@@ -1,4 +1,5 @@
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
+import { AppShell } from './components/AppShell/AppShell'
 import { InvoiceDetailPage } from './components/InvoiceDetailPage/InvoiceDetailPage'
 import { InvoiceFormPage } from './components/InvoiceFormPage/InvoiceFormPage'
 import { InvoiceListPage } from './components/InvoiceListPage/InvoiceListPage'
@@ -24,20 +25,38 @@ export const App = () => {
     if (route.name !== 'list') navigate(paths.list())
   }
 
+  const numberFor = (id: string) => invoices.find((item) => item.id === id)?.invoiceNumber ?? id.toUpperCase()
+  const breadcrumbs = ['Accounts receivable', 'Invoices']
+  let page: ReactNode
+
   switch (route.name) {
     case 'new':
-    case 'edit':
-      return (
+      breadcrumbs.push('New invoice')
+      page = (
         <InvoiceFormPage
-          invoiceId={route.name === 'edit' ? route.id : null}
+          invoiceId={null}
           customers={customers}
           asOfDate={meta.asOfDate}
           onSaved={handleSaved}
-          onCancel={() => navigate(route.name === 'edit' ? paths.detail(route.id) : paths.list())}
+          onCancel={() => navigate(paths.list())}
         />
       )
+      break
+    case 'edit':
+      breadcrumbs.push(`Edit ${numberFor(route.id)}`)
+      page = (
+        <InvoiceFormPage
+          invoiceId={route.id}
+          customers={customers}
+          asOfDate={meta.asOfDate}
+          onSaved={handleSaved}
+          onCancel={() => navigate(paths.detail(route.id))}
+        />
+      )
+      break
     case 'detail':
-      return (
+      breadcrumbs.push(numberFor(route.id))
+      page = (
         <InvoiceDetailPage
           id={route.id}
           asOfDate={meta.asOfDate}
@@ -47,8 +66,9 @@ export const App = () => {
           onDeleted={handleDeleted}
         />
       )
+      break
     default:
-      return (
+      page = (
         <InvoiceListPage
           invoices={invoices}
           status={status}
@@ -63,4 +83,10 @@ export const App = () => {
         />
       )
   }
+
+  return (
+    <AppShell companyName={meta.companyName} asOfDate={meta.asOfDate} breadcrumbs={breadcrumbs}>
+      {page}
+    </AppShell>
+  )
 }
