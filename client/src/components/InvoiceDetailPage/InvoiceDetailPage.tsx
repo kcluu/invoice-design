@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { paths } from '../../hooks/useHashRoute'
 import { useInvoice } from '../../hooks/useInvoice'
 import { useInvoiceActions } from '../../hooks/useInvoiceActions'
 import { REVENUE_ACCOUNTS, type Invoice } from '../../types/invoice'
@@ -8,6 +9,7 @@ import { availableActions } from '../../utils/invoicePermissions'
 import { computeTotals, lineAmount } from '../../utils/invoiceTotals'
 import { formatMoney, formatPercent, formatQuantity, formatUnitPrice } from '../../utils/money'
 import { ConfirmDeleteDialog } from '../ConfirmDeleteDialog/ConfirmDeleteDialog'
+import { ErrorState } from '../ErrorState/ErrorState'
 import { InvoiceDetailSkeleton } from '../InvoiceDetailSkeleton/InvoiceDetailSkeleton'
 
 interface InvoiceDetailPageProp {
@@ -25,7 +27,7 @@ const accountLabel = (code: string) => {
 }
 
 export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onDeleted }: InvoiceDetailPageProp) => {
-  const { invoice, status, error, setInvoice } = useInvoice(id)
+  const { invoice, status, error, setInvoice, reload } = useInvoice(id)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const actions = useInvoiceActions({
     onUpdated: (updated) => {
@@ -36,7 +38,16 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onD
   })
 
   if (status === 'loading') return <InvoiceDetailSkeleton />
-  if (status === 'error' || !invoice) return <p>{error}</p>
+  if (status === 'error' || !invoice) {
+    return (
+      <ErrorState
+        title="Couldn’t open this invoice"
+        message={error ?? 'Something went wrong.'}
+        onRetry={() => void reload()}
+        backHref={`#${paths.list()}`}
+      />
+    )
+  }
 
   const totals = computeTotals(invoice)
   const due = dueInfo(invoice, asOfDate)
@@ -82,7 +93,14 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onD
           </button>
         )}
       </div>
-      {actions.error && <p>{actions.error}</p>}
+      {actions.error && (
+        <div role="alert">
+          <p>{actions.error}</p>
+          <button type="button" onClick={actions.clearError}>
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <h2>Details</h2>
       <dl>

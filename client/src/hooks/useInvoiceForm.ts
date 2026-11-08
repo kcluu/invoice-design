@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
-import type { Invoice, InvoiceInput, PaymentTerms } from '../types/invoice'
+import type { FieldErrors, Invoice, InvoiceInput, PaymentTerms } from '../types/invoice'
 import type { CustomerProfile } from '../utils/customers'
 import { addDays, TERM_DAYS } from '../utils/dates'
 import { computeTotals } from '../utils/invoiceTotals'
+import { summarizeErrors, validateInvoiceForm } from '../utils/validateInvoiceForm'
 
 // inputs hold strings so a half-typed number like "0." doesn't get mangled
 export interface LineDraft {
@@ -112,7 +113,16 @@ interface UseInvoiceFormOptions {
 }
 
 export const useInvoiceForm = ({ initialValues, customers }: UseInvoiceFormOptions) => {
-  const [values, setValues] = useState<InvoiceFormValues>(initialValues)
+  const [values, setRawValues] = useState<InvoiceFormValues>(initialValues)
+  // errors stay hidden until the first save attempt, then update live as fields are fixed
+  const [showErrors, setShowErrors] = useState(false)
+  const [serverErrors, setServerErrors] = useState<FieldErrors>({})
+
+  // any edit makes the last server response stale
+  const setValues = useCallback((update: (current: InvoiceFormValues) => InvoiceFormValues) => {
+    setServerErrors((current) => (Object.keys(current).length ? {} : current))
+    setRawValues(update)
+  }, [])
 
   const setField = useCallback(
     <K extends FieldKey>(key: K, value: InvoiceFormValues[K]) => {
@@ -138,22 +148,45 @@ export const useInvoiceForm = ({ initialValues, customers }: UseInvoiceFormOptio
         return next
       })
     },
-    [customers]
+    [customers, setValues]
   )
 
-  const setLine = useCallback((key: string, field: LineField, value: string) => {
-    setValues((current) => ({
-      ...current,
-      lineItems: current.lineItems.map((line) => (line.key === key ? { ...line, [field]: value } : line)),
-    }))
-  }, [])
+  const setLine = useCallback(
+    (key: string, field: LineField, value: string) => {
+      setValues((current) => ({
+        ...current,
+        lineItems: current.lineItems.map((line) => (line.key === key ? { ...line, [field]: value } : line)),
+      }))
+    },
+    [setValues]
+  )
 
   const addLine = useCallback(() => {
     setValues((current) => ({ ...current, lineItems: [...current.lineItems, emptyLine()] }))
-  }, [])
+  }, [setValues])
 
-  const removeLine = useCallback((key: string) => {
-    setValues((current) => ({ ...current, lineItems: current.lineItems.filter((line) => line.key !== key) }))
+  const removeLine = useCallback(
+    (key: string) => {
+      setValues((current) => ({ ...current, lineItems: current.lineItems.filter((line) => line.key !== key) }))
+    },
+    [setValues]
+  )
+
+  const clientErrors = useMemo(() => validateInvoiceForm(values), [values])
+  const errors = useMemo<FieldErrors>(
+    () => (showErrors ? { ...serverErrors, ...clientErrors } : {}),
+    [showErrors, serverErrors, clientErrors]
+  )
+
+  // returns true when the form is ready to send to the api
+  const validate = useCallback(() => {
+    setShowErrors(true)
+    return Object.keys(clientErrors).length === 0
+  }, [clientErrors])
+
+  const applyServerErrors = useCallback((fields: FieldErrors) => {
+    setServerErrors(fields)
+    setShowErrors(true)
   }, [])
 
   const input = useMemo(() => toInvoiceInput(values), [values])
@@ -168,5 +201,18 @@ export const useInvoiceForm = ({ initialValues, customers }: UseInvoiceFormOptio
     [input]
   )
 
-  return { values, setValues, setField, setLine, addLine, removeLine, input, totals }
+  return {
+    values,
+    setValues,
+    setField,
+    setLine,
+    addLine,
+    removeLine,
+    input,
+    totals,
+    errors,
+    errorSummary: summarizeErrors(errors),
+    validate,
+    applyServerErrors,
+  }
 }

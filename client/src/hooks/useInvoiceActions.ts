@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { errorMessage } from '../api/http'
 import { invoicesApi } from '../api/invoicesApi'
 import type { Invoice } from '../types/invoice'
 
@@ -27,7 +28,7 @@ export const useInvoiceActions = ({ onUpdated, onDeleted }: UseInvoiceActionsOpt
         }
         return true
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'That didn’t work, try again')
+        setError(errorMessage(err, 'That didn’t work. Try again.'))
         return false
       } finally {
         setPending(null)

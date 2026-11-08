@@ -30,6 +30,7 @@ const renderPage = (overrides: Partial<Parameters<typeof InvoiceListPage>[0]> = 
     onOpen: vi.fn(),
     onEdit: vi.fn(),
     onCreate: vi.fn(),
+    onRetry: vi.fn(),
     onUpdated: vi.fn(),
     onDeleted: vi.fn(),
     ...overrides,
@@ -57,6 +58,14 @@ describe('InvoiceListPage', () => {
     await user.click(screen.getByText('Drafts to send'))
     expect(bodyRows()).toHaveLength(1)
     expect(within(bodyRows()[0]).getByText('Brightline Health')).toBeInTheDocument()
+  })
+
+  it('offers a retry when invoices fail to load', async () => {
+    const user = userEvent.setup()
+    const props = renderPage({ status: 'error', error: 'Can’t reach the server. Check your connection and try again.' })
+    expect(screen.getByText('Couldn’t load invoices')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Try again' }))
+    expect(props.onRetry).toHaveBeenCalled()
   })
 
   it('opens an invoice from its number', async () => {

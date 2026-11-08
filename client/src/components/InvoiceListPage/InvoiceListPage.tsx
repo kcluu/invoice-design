@@ -4,6 +4,7 @@ import { useInvoiceFilters } from '../../hooks/useInvoiceFilters'
 import type { LoadStatus } from '../../hooks/useInvoices'
 import type { Invoice } from '../../types/invoice'
 import { ConfirmDeleteDialog } from '../ConfirmDeleteDialog/ConfirmDeleteDialog'
+import { ErrorState } from '../ErrorState/ErrorState'
 import { InvoiceTable } from '../InvoiceTable/InvoiceTable'
 import { InvoiceTableSkeleton } from '../InvoiceTableSkeleton/InvoiceTableSkeleton'
 import { StatusTabs } from '../StatusTabs/StatusTabs'
@@ -17,6 +18,7 @@ interface InvoiceListPageProp {
   onOpen: (id: string) => void
   onEdit: (id: string) => void
   onCreate: () => void
+  onRetry: () => void
   onUpdated: (invoice: Invoice) => void
   onDeleted: (invoice: Invoice) => void
 }
@@ -29,6 +31,7 @@ export const InvoiceListPage = ({
   onOpen,
   onEdit,
   onCreate,
+  onRetry,
   onUpdated,
   onDeleted,
 }: InvoiceListPageProp) => {
@@ -55,9 +58,16 @@ export const InvoiceListPage = ({
       <StatusTabs value={filter} counts={counts} onChange={setFilter} />
       <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search number or customer" />
 
-      {actions.error && <p>{actions.error}</p>}
+      {actions.error && (
+        <div role="alert">
+          <p>{actions.error}</p>
+          <button type="button" onClick={actions.clearError}>
+            Dismiss
+          </button>
+        </div>
+      )}
       {status === 'loading' && <InvoiceTableSkeleton />}
-      {status === 'error' && <p>{error}</p>}
+      {status === 'error' && <ErrorState title="Couldn’t load invoices" message={error ?? 'Something went wrong.'} onRetry={onRetry} />}
       {status === 'success' && (
         <InvoiceTable
           invoices={visible}

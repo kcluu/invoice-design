@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { errorMessage } from '../api/http'
 import { invoicesApi } from '../api/invoicesApi'
 import type { Invoice } from '../types/invoice'
 import type { LoadStatus } from './useInvoices'
@@ -21,7 +22,7 @@ export const useInvoice = (id: string | null) => {
       setStatus('success')
     } catch (err) {
       if (current !== requestId.current) return
-      setError(err instanceof Error ? err.message : 'Couldn’t load this invoice')
+      setError(errorMessage(err, 'Couldn’t load this invoice.'))
       setStatus('error')
     }
   }, [id])

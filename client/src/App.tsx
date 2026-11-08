@@ -11,7 +11,7 @@ import { deriveCustomers } from './utils/customers'
 export const App = () => {
   const { route, navigate } = useHashRoute()
   const meta = useMeta()
-  const { invoices, status, error, upsertInvoice, removeInvoice } = useInvoices()
+  const { invoices, status, error, reload, upsertInvoice, removeInvoice } = useInvoices()
   const customers = useMemo(() => deriveCustomers(invoices), [invoices])
 
   const handleSaved = (invoice: Invoice) => {
@@ -57,6 +57,7 @@ export const App = () => {
           onOpen={(id) => navigate(paths.detail(id))}
           onEdit={(id) => navigate(paths.edit(id))}
           onCreate={() => navigate(paths.new())}
+          onRetry={() => void reload()}
           onUpdated={upsertInvoice}
           onDeleted={handleDeleted}
         />
