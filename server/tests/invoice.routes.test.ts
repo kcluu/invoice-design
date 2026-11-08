@@ -28,7 +28,10 @@ describe('invoice routes', () => {
     // fresh in-memory copy of the seed for every test
     const repository = createMemoryRepository(seed.invoices)
     const service = createInvoiceService(repository, { asOfDate: seed.currentDate })
-    app = createApp({ service, meta: { companyName: seed.company.name, baseCurrency: seed.company.baseCurrency, asOfDate: seed.currentDate } })
+    app = createApp({
+      service,
+      meta: { companyName: seed.company.name, baseCurrency: seed.company.baseCurrency, asOfDate: seed.currentDate },
+    })
   })
 
   it('lists the seeded invoices with derived payment status', async () => {
@@ -51,7 +54,10 @@ describe('invoice routes', () => {
   })
 
   it('creates and sends in one step', async () => {
-    const res = await request(app).post('/api/invoices').send({ ...newInvoice, send: true }).expect(201)
+    const res = await request(app)
+      .post('/api/invoices')
+      .send({ ...newInvoice, send: true })
+      .expect(201)
     expect(res.body.status).toBe('Sent')
     expect(res.body.paymentStatus).toBe('Open')
   })
@@ -59,9 +65,16 @@ describe('invoice routes', () => {
   it('rejects an invalid invoice with field errors', async () => {
     const res = await request(app)
       .post('/api/invoices')
-      .send({ ...newInvoice, customerName: '', billingEmail: 'nope', lineItems: [{ description: '', quantity: -1, unitPrice: 5, accountCode: '4100' }] })
+      .send({
+        ...newInvoice,
+        customerName: '',
+        billingEmail: 'nope',
+        lineItems: [{ description: '', quantity: -1, unitPrice: 5, accountCode: '4100' }],
+      })
       .expect(422)
-    expect(Object.keys(res.body.fields)).toEqual(expect.arrayContaining(['customerName', 'billingEmail', 'lineItems.0.description', 'lineItems.0.quantity']))
+    expect(Object.keys(res.body.fields)).toEqual(
+      expect.arrayContaining(['customerName', 'billingEmail', 'lineItems.0.description', 'lineItems.0.quantity'])
+    )
   })
 
   it('edits a draft invoice', async () => {
