@@ -5,6 +5,7 @@ import type { LoadStatus } from '../../hooks/useInvoices'
 import type { Invoice } from '../../types/invoice'
 import { ConfirmDeleteDialog } from '../ConfirmDeleteDialog/ConfirmDeleteDialog'
 import { InvoiceTable } from '../InvoiceTable/InvoiceTable'
+import { InvoiceTableSkeleton } from '../InvoiceTableSkeleton/InvoiceTableSkeleton'
 import { StatusTabs } from '../StatusTabs/StatusTabs'
 import { SummaryCards } from '../SummaryCards/SummaryCards'
 
@@ -50,12 +51,12 @@ export const InvoiceListPage = ({
         Add invoice
       </button>
 
-      <SummaryCards groups={groups} activeFilter={filter} onSelect={setFilter} />
+      <SummaryCards groups={groups} activeFilter={filter} loading={status === 'loading'} onSelect={setFilter} />
       <StatusTabs value={filter} counts={counts} onChange={setFilter} />
       <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search number or customer" />
 
       {actions.error && <p>{actions.error}</p>}
-      {status === 'loading' && <p>Loading invoices…</p>}
+      {status === 'loading' && <InvoiceTableSkeleton />}
       {status === 'error' && <p>{error}</p>}
       {status === 'success' && (
         <InvoiceTable

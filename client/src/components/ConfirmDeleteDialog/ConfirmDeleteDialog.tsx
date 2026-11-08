@@ -38,7 +38,7 @@ export const ConfirmDeleteDialog = ({ invoice, busy, onCancel, onConfirm, onVoid
         </button>
       )}
       <button type="button" onClick={onConfirm} disabled={busy}>
-        Delete invoice
+        {busy ? 'Deleting…' : 'Delete invoice'}
       </button>
     </div>
   )

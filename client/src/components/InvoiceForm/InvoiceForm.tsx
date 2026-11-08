@@ -146,15 +146,15 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
       </button>
       {invoice ? (
         <button type="submit" disabled={saving}>
-          Save changes
+          {saving ? 'Saving…' : 'Save changes'}
         </button>
       ) : (
         <>
           <button type="submit" disabled={saving}>
-            Save as draft
+            {saving ? 'Saving…' : 'Save as draft'}
           </button>
           <button type="button" disabled={saving} onClick={() => void submit(true)}>
-            Save and send
+            {saving ? 'Saving…' : 'Save and send'}
           </button>
         </>
       )}

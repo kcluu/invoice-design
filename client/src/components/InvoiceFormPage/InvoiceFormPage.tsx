@@ -3,6 +3,7 @@ import { emptyForm, formFromInvoice } from '../../hooks/useInvoiceForm'
 import { useInvoice } from '../../hooks/useInvoice'
 import type { Invoice } from '../../types/invoice'
 import type { CustomerProfile } from '../../utils/customers'
+import { InvoiceDetailSkeleton } from '../InvoiceDetailSkeleton/InvoiceDetailSkeleton'
 import { InvoiceForm } from '../InvoiceForm/InvoiceForm'
 
 interface InvoiceFormPageProp {
@@ -20,7 +21,7 @@ export const InvoiceFormPage = ({ invoiceId, customers, asOfDate, onSaved, onCan
   if (!invoiceId) {
     return <InvoiceForm invoice={null} initialValues={createValues} customers={customers} onSaved={onSaved} onCancel={onCancel} />
   }
-  if (status === 'loading') return <p>Loading invoice…</p>
+  if (status === 'loading') return <InvoiceDetailSkeleton />
   if (status === 'error' || !invoice) return <p>{error}</p>
 
   // key resets the form state if a different invoice loads

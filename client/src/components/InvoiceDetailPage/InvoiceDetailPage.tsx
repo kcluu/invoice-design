@@ -8,6 +8,7 @@ import { availableActions } from '../../utils/invoicePermissions'
 import { computeTotals, lineAmount } from '../../utils/invoiceTotals'
 import { formatMoney, formatPercent, formatQuantity, formatUnitPrice } from '../../utils/money'
 import { ConfirmDeleteDialog } from '../ConfirmDeleteDialog/ConfirmDeleteDialog'
+import { InvoiceDetailSkeleton } from '../InvoiceDetailSkeleton/InvoiceDetailSkeleton'
 
 interface InvoiceDetailPageProp {
   id: string
@@ -34,7 +35,7 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onD
     onDeleted,
   })
 
-  if (status === 'loading') return <p>Loading invoice…</p>
+  if (status === 'loading') return <InvoiceDetailSkeleton />
   if (status === 'error' || !invoice) return <p>{error}</p>
 
   const totals = computeTotals(invoice)
@@ -42,6 +43,7 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onD
   const money = (amount: number) => formatMoney(amount, invoice.currency)
   const allowed = availableActions(invoice)
   const busy = actions.pending !== null
+  const pendingAction = actions.pending?.action
 
   return (
     <section>
@@ -61,17 +63,17 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onD
         )}
         {allowed.canSend && (
           <button type="button" disabled={busy} onClick={() => void actions.run(invoice, 'send')}>
-            Send invoice
+            {pendingAction === 'send' ? 'Sending…' : 'Send invoice'}
           </button>
         )}
         {allowed.canRecordPayment && (
           <button type="button" disabled={busy} onClick={() => void actions.run(invoice, 'recordPayment')}>
-            Record payment
+            {pendingAction === 'recordPayment' ? 'Recording…' : 'Record payment'}
           </button>
         )}
         {allowed.canVoid && (
           <button type="button" disabled={busy} onClick={() => void actions.run(invoice, 'void')}>
-            Void
+            {pendingAction === 'void' ? 'Voiding…' : 'Void'}
           </button>
         )}
         {allowed.canDelete && (
