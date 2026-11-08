@@ -1,14 +1,21 @@
+import { useState } from 'react'
 import { useInvoice } from '../../hooks/useInvoice'
-import { REVENUE_ACCOUNTS } from '../../types/invoice'
+import { useInvoiceActions } from '../../hooks/useInvoiceActions'
+import { REVENUE_ACCOUNTS, type Invoice } from '../../types/invoice'
 import { formatDate, formatTimestamp } from '../../utils/dates'
 import { displayStatus, dueInfo } from '../../utils/invoiceStatus'
+import { availableActions } from '../../utils/invoicePermissions'
 import { computeTotals, lineAmount } from '../../utils/invoiceTotals'
 import { formatMoney, formatPercent, formatQuantity, formatUnitPrice } from '../../utils/money'
+import { ConfirmDeleteDialog } from '../ConfirmDeleteDialog/ConfirmDeleteDialog'
 
 interface InvoiceDetailPageProp {
   id: string
   asOfDate: string
   onBack: () => void
+  onEdit: (id: string) => void
+  onUpdated: (invoice: Invoice) => void
+  onDeleted: (invoice: Invoice) => void
 }
 
 const accountLabel = (code: string) => {
@@ -16,8 +23,16 @@ const accountLabel = (code: string) => {
   return account ? `${code} · ${account.name}` : code
 }
 
-export const InvoiceDetailPage = ({ id, asOfDate, onBack }: InvoiceDetailPageProp) => {
-  const { invoice, status, error } = useInvoice(id)
+export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onDeleted }: InvoiceDetailPageProp) => {
+  const { invoice, status, error, setInvoice } = useInvoice(id)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const actions = useInvoiceActions({
+    onUpdated: (updated) => {
+      setInvoice(updated)
+      onUpdated(updated)
+    },
+    onDeleted,
+  })
 
   if (status === 'loading') return <p>Loading invoice…</p>
   if (status === 'error' || !invoice) return <p>{error}</p>
@@ -25,6 +40,8 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack }: InvoiceDetailPagePro
   const totals = computeTotals(invoice)
   const due = dueInfo(invoice, asOfDate)
   const money = (amount: number) => formatMoney(amount, invoice.currency)
+  const allowed = availableActions(invoice)
+  const busy = actions.pending !== null
 
   return (
     <section>
@@ -35,6 +52,35 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack }: InvoiceDetailPagePro
       <p>
         {displayStatus(invoice)} · {invoice.customerName} · {invoice.currency}
       </p>
+
+      <div>
+        {allowed.canEdit && (
+          <button type="button" onClick={() => onEdit(invoice.id)}>
+            Edit
+          </button>
+        )}
+        {allowed.canSend && (
+          <button type="button" disabled={busy} onClick={() => void actions.run(invoice, 'send')}>
+            Send invoice
+          </button>
+        )}
+        {allowed.canRecordPayment && (
+          <button type="button" disabled={busy} onClick={() => void actions.run(invoice, 'recordPayment')}>
+            Record payment
+          </button>
+        )}
+        {allowed.canVoid && (
+          <button type="button" disabled={busy} onClick={() => void actions.run(invoice, 'void')}>
+            Void
+          </button>
+        )}
+        {allowed.canDelete && (
+          <button type="button" disabled={busy} onClick={() => setConfirmingDelete(true)}>
+            Delete
+          </button>
+        )}
+      </div>
+      {actions.error && <p>{actions.error}</p>}
 
       <h2>Details</h2>
       <dl>
@@ -98,6 +144,18 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack }: InvoiceDetailPagePro
           </li>
         ))}
       </ol>
+
+      {confirmingDelete && (
+        <ConfirmDeleteDialog
+          invoice={invoice}
+          busy={busy}
+          onCancel={() => setConfirmingDelete(false)}
+          onConfirm={() => void actions.run(invoice, 'delete')}
+          onVoidInstead={async () => {
+            if (await actions.run(invoice, 'void')) setConfirmingDelete(false)
+          }}
+        />
+      )}
     </section>
   )
 }

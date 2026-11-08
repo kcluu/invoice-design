@@ -1,16 +1,21 @@
+import type { InvoiceAction } from '../../hooks/useInvoiceActions'
 import type { Invoice } from '../../types/invoice'
 import { formatDate } from '../../utils/dates'
 import { displayStatus, dueInfo } from '../../utils/invoiceStatus'
 import { computeTotals } from '../../utils/invoiceTotals'
 import { formatMoney } from '../../utils/money'
+import { RowActionsMenu } from '../RowActionsMenu/RowActionsMenu'
 
 interface InvoiceTableProp {
   invoices: Invoice[]
   asOfDate: string
   onOpen: (id: string) => void
+  onEdit: (id: string) => void
+  onAction: (invoice: Invoice, action: Exclude<InvoiceAction, 'delete'>) => void
+  onRequestDelete: (invoice: Invoice) => void
 }
 
-export const InvoiceTable = ({ invoices, asOfDate, onOpen }: InvoiceTableProp) => {
+export const InvoiceTable = ({ invoices, asOfDate, onOpen, onEdit, onAction, onRequestDelete }: InvoiceTableProp) => {
   if (!invoices.length) return <p>No invoices match this view.</p>
 
   return (
@@ -23,6 +28,7 @@ export const InvoiceTable = ({ invoices, asOfDate, onOpen }: InvoiceTableProp) =
           <th>Due</th>
           <th>Status</th>
           <th>Amount</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -44,6 +50,15 @@ export const InvoiceTable = ({ invoices, asOfDate, onOpen }: InvoiceTableProp) =
               </td>
               <td>{displayStatus(invoice)}</td>
               <td>{formatMoney(computeTotals(invoice).total, invoice.currency)}</td>
+              <td>
+                <RowActionsMenu
+                  invoice={invoice}
+                  onView={() => onOpen(invoice.id)}
+                  onEdit={() => onEdit(invoice.id)}
+                  onAction={(action) => onAction(invoice, action)}
+                  onRequestDelete={() => onRequestDelete(invoice)}
+                />
+              </td>
             </tr>
           )
         })}
