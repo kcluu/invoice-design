@@ -73,3 +73,15 @@ export interface AppMeta {
 }
 
 export type FieldErrors = Record<string, string>
+
+export interface DraftExample {
+  id: string
+  label: string
+  input: string
+}
+
+export interface DraftResult {
+  draft: InvoiceInput
+  needsReview: string[]
+  filledFields: Array<keyof InvoiceInput>
+}

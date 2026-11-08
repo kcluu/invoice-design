@@ -31,6 +31,7 @@ const renderPage = (overrides: Partial<Parameters<typeof InvoiceListPage>[0]> = 
     onOpen: vi.fn(),
     onEdit: vi.fn(),
     onCreate: vi.fn(),
+    onDraftFromText: vi.fn(),
     onRetry: vi.fn(),
     onUpdated: vi.fn(),
     onDeleted: vi.fn(),

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useFocusOnReady } from '../../hooks/useFocusOnReady'
-import { useInvoiceForm, type InvoiceFormValues } from '../../hooks/useInvoiceForm'
+import { formFromInput, useInvoiceForm, type InvoiceFormValues } from '../../hooks/useInvoiceForm'
 import { useSaveInvoice } from '../../hooks/useSaveInvoice'
 import { CURRENCIES, PAYMENT_TERMS, type Invoice, type PaymentTerms } from '../../types/invoice'
 import type { CustomerProfile } from '../../utils/customers'
@@ -8,6 +8,7 @@ import { fieldId } from '../../utils/fieldId'
 import { availableActions } from '../../utils/invoicePermissions'
 import { formatMoney } from '../../utils/money'
 import { Button } from '../Button/Button'
+import { DraftFromText } from '../DraftFromText/DraftFromText'
 import { ErrorSummary } from '../ErrorSummary/ErrorSummary'
 import { FieldError } from '../FieldError/FieldError'
 import { LineItemsEditor } from '../LineItemsEditor/LineItemsEditor'
@@ -20,6 +21,7 @@ import {
   FieldGrid,
   Footer,
   Form,
+  Header,
   Hint,
   Note,
   Required,
@@ -35,9 +37,10 @@ interface InvoiceFormProp {
   customers: CustomerProfile[]
   onSaved: (invoice: Invoice) => void
   onCancel: () => void
+  showDraftPanel?: boolean
 }
 
-export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCancel }: InvoiceFormProp) => {
+export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCancel, showDraftPanel = false }: InvoiceFormProp) => {
   const form = useInvoiceForm({ initialValues, customers })
   const { values, setField, errors } = form
   const { save, saving, error } = useSaveInvoice()
@@ -47,6 +50,7 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
 
   // counts failed save attempts so the error summary can take focus each time
   const [failedAttempts, setFailedAttempts] = useState(0)
+  const [draftOpen, setDraftOpen] = useState(showDraftPanel)
 
   // ties an input to its id, required state, hint and inline error
   const fieldProps = (key: string, { required = false, hintId }: { required?: boolean; hintId?: string } = {}) => ({
@@ -81,14 +85,23 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
         void submit(false)
       }}
     >
-      <div>
-        <Title ref={headingRef} tabIndex={-1}>
-          {invoice ? `Edit ${invoice.invoiceNumber}` : 'New invoice'}
-        </Title>
-        <Subtitle>
-          {invoice ? `${invoice.customerName} · ${invoice.status}` : 'Creates a draft you can review before it goes to the customer.'}
-        </Subtitle>
-      </div>
+      <Header>
+        <div>
+          <Title ref={headingRef} tabIndex={-1}>
+            {invoice ? `Edit ${invoice.invoiceNumber}` : 'New invoice'}
+          </Title>
+          <Subtitle>
+            {invoice ? `${invoice.customerName} · ${invoice.status}` : 'Creates a draft you can review before it goes to the customer.'}
+          </Subtitle>
+        </div>
+        {!invoice && !draftOpen && (
+          <Button variant="ghost" onClick={() => setDraftOpen(true)}>
+            Draft from text instead
+          </Button>
+        )}
+      </Header>
+
+      {!invoice && draftOpen && <DraftFromText onDraft={(result) => form.setValues(() => formFromInput(result.draft))} />}
 
       <Hint>
         Fields marked <Required aria-hidden="true">*</Required>

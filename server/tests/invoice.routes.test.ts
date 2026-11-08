@@ -105,6 +105,21 @@ describe('invoice routes', () => {
     expect(voided.body.status).toBe('Void')
   })
 
+  it('drafts an invoice from a plain text request without saving it', async () => {
+    const res = await request(app)
+      .post('/api/invoices/draft-from-text')
+      .send({ text: 'Invoice Acme Labs for 10 hours at $200, Net 15' })
+      .expect(200)
+    expect(res.body.draft).toMatchObject({ customerName: 'Acme Labs', paymentTerms: 'Net 15' })
+    const list = await request(app).get('/api/invoices').expect(200)
+    expect(list.body).toHaveLength(5)
+  })
+
+  it('rejects an empty draft request', async () => {
+    const res = await request(app).post('/api/invoices/draft-from-text').send({ text: '  ' }).expect(422)
+    expect(res.body.fields.text).toBeDefined()
+  })
+
   it('deletes a draft but not a paid invoice', async () => {
     await request(app).delete('/api/invoices/inv-2026-0413').expect(204)
     await request(app).get('/api/invoices/inv-2026-0413').expect(404)

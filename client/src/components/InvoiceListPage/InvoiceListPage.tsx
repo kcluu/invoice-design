@@ -33,6 +33,7 @@ interface InvoiceListPageProp {
   onOpen: (id: string) => void
   onEdit: (id: string) => void
   onCreate: () => void
+  onDraftFromText: () => void
   onRetry: () => void
   onUpdated: (invoice: Invoice) => void
   onDeleted: (invoice: Invoice) => void
@@ -53,6 +54,7 @@ export const InvoiceListPage = ({
   onOpen,
   onEdit,
   onCreate,
+  onDraftFromText,
   onRetry,
   onUpdated,
   onDeleted,
@@ -84,6 +86,12 @@ export const InvoiceListPage = ({
           </Subtitle>
         </TitleBlock>
         <HeaderActions>
+          <Button onClick={onDraftFromText}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z" />
+            </svg>
+            Draft from text
+          </Button>
           <Button variant="primary" onClick={onCreate}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
               <path d="M12 5v14M5 12h14" />

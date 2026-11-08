@@ -35,6 +35,14 @@ export const Form = styled.form`
   gap: 18px;
 `
 
+export const Header = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+`
+
 export const Title = styled.h1`
   font-size: ${({ theme }) => theme.font.size.xxl};
   font-weight: 600;

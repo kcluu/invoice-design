@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { draftFromText } from './invoice.draftFromText'
 import type { InvoiceRepository } from './invoice.repository'
 import { derivePaymentStatus, withPaymentStatus } from './invoice.status'
 import { computeTotals } from './invoice.totals'
@@ -150,6 +151,13 @@ export const createInvoiceService = (repository: InvoiceRepository, { asOfDate, 
       const invoice = await getOrThrow(id)
       requireStatus(invoice, ['Sent'], 'only sent invoices can be voided, delete drafts instead')
       return save({ ...invoice, status: 'Void', activity: [...invoice.activity, entry(actor, 'Voided invoice')] })
+    },
+
+    async draftFromText(body: unknown) {
+      const text = isRecord(body) && typeof body.text === 'string' ? body.text.trim() : ''
+      if (!text) throw new ServiceError(422, 'describe the invoice you want to draft', { text: 'is required' })
+      if (text.length > 2000) throw new ServiceError(422, 'request is too long', { text: 'must be 2000 characters or fewer' })
+      return draftFromText(text, { invoices: await repository.list(), asOfDate })
     },
 
     async remove(id: string) {

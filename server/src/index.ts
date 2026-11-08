@@ -12,6 +12,7 @@ const service = createInvoiceService(createPgRepository(pool), { asOfDate })
 const app = createApp({
   service,
   meta: { companyName: seed.company.name, baseCurrency: seed.company.baseCurrency, asOfDate },
+  draftExamples: seed.examples,
 })
 
 app.listen(config.port, () => {

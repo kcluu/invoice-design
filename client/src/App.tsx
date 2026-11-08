@@ -39,6 +39,7 @@ export const App = () => {
       page = (
         <InvoiceFormPage
           invoiceId={null}
+          startWithDraft={route.fromText}
           customers={customers}
           asOfDate={meta.asOfDate}
           onSaved={handleSaved}
@@ -82,6 +83,7 @@ export const App = () => {
           onOpen={(id) => navigate(paths.detail(id))}
           onEdit={(id) => navigate(paths.edit(id))}
           onCreate={() => navigate(paths.new())}
+          onDraftFromText={() => navigate(paths.newFromText())}
           onRetry={() => void reload()}
           onUpdated={upsertInvoice}
           onDeleted={handleDeleted}

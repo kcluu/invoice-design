@@ -14,14 +14,24 @@ interface InvoiceFormPageProp {
   asOfDate: string
   onSaved: (invoice: Invoice) => void
   onCancel: () => void
+  startWithDraft?: boolean
 }
 
-export const InvoiceFormPage = ({ invoiceId, customers, asOfDate, onSaved, onCancel }: InvoiceFormPageProp) => {
+export const InvoiceFormPage = ({ invoiceId, customers, asOfDate, onSaved, onCancel, startWithDraft = false }: InvoiceFormPageProp) => {
   const { invoice, status, error, reload } = useInvoice(invoiceId)
   const createValues = useMemo(() => emptyForm(asOfDate), [asOfDate])
 
   if (!invoiceId) {
-    return <InvoiceForm invoice={null} initialValues={createValues} customers={customers} onSaved={onSaved} onCancel={onCancel} />
+    return (
+      <InvoiceForm
+        invoice={null}
+        showDraftPanel={startWithDraft}
+        initialValues={createValues}
+        customers={customers}
+        onSaved={onSaved}
+        onCancel={onCancel}
+      />
+    )
   }
   if (status === 'loading') return <InvoiceDetailSkeleton />
   if (status === 'error' || !invoice) {

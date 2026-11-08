@@ -9,6 +9,7 @@ describe('parseRoute', () => {
 
   it('reads new, detail and edit routes', () => {
     expect(parseRoute('#/invoices/new')).toEqual({ name: 'new' })
+    expect(parseRoute(`#${paths.newFromText()}`)).toEqual({ name: 'new', fromText: true })
     expect(parseRoute(`#${paths.detail('inv-2026-0412')}`)).toEqual({ name: 'detail', id: 'inv-2026-0412' })
     expect(parseRoute(`#${paths.edit('inv-2026-0412')}`)).toEqual({ name: 'edit', id: 'inv-2026-0412' })
   })

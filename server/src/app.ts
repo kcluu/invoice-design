@@ -1,5 +1,6 @@
 import cors from 'cors'
 import express, { type ErrorRequestHandler } from 'express'
+import type { DraftExample } from './db/seedData'
 import { createInvoiceRouter } from './invoices/invoice.routes'
 import { ServiceError, type InvoiceService } from './invoices/invoice.service'
 
@@ -12,6 +13,7 @@ export interface AppMeta {
 interface CreateAppOptions {
   service: InvoiceService
   meta: AppMeta
+  draftExamples?: DraftExample[]
 }
 
 const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
@@ -28,7 +30,7 @@ const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
   res.status(500).json({ error: 'something went wrong on our side' })
 }
 
-export const createApp = ({ service, meta }: CreateAppOptions) => {
+export const createApp = ({ service, meta, draftExamples = [] }: CreateAppOptions) => {
   const app = express()
   app.use(cors())
   app.use(express.json({ limit: '100kb' }))
@@ -39,7 +41,7 @@ export const createApp = ({ service, meta }: CreateAppOptions) => {
   app.get('/api/meta', (_req, res) => {
     res.json(meta)
   })
-  app.use('/api/invoices', createInvoiceRouter(service))
+  app.use('/api/invoices', createInvoiceRouter(service, draftExamples))
 
   app.use((_req, res) => {
     res.status(404).json({ error: 'not found' })

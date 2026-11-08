@@ -60,27 +60,31 @@ export const emptyForm = (asOfDate: string): InvoiceFormValues => ({
   lineItems: [emptyLine()],
 })
 
-export const formFromInvoice = (invoice: Invoice): InvoiceFormValues => ({
-  customerName: invoice.customerName,
-  billingEmail: invoice.billingEmail,
-  billingAddress: invoice.billingAddress,
-  paymentTerms: invoice.paymentTerms,
-  currency: invoice.currency,
-  issueDate: invoice.issueDate,
-  dueDate: invoice.dueDate,
-  memo: invoice.memo,
-  taxPercent: percentOf(invoice.taxRate),
-  discount: String(invoice.discount),
-  lineItems: invoice.lineItems.map((line) =>
-    emptyLine({
-      id: line.id,
-      description: line.description,
-      quantity: String(line.quantity),
-      unitPrice: String(line.unitPrice),
-      accountCode: line.accountCode,
-    })
-  ),
+export const formFromInput = (input: InvoiceInput): InvoiceFormValues => ({
+  customerName: input.customerName,
+  billingEmail: input.billingEmail,
+  billingAddress: input.billingAddress,
+  paymentTerms: input.paymentTerms,
+  currency: input.currency,
+  issueDate: input.issueDate,
+  dueDate: input.dueDate,
+  memo: input.memo,
+  taxPercent: percentOf(input.taxRate),
+  discount: String(input.discount),
+  lineItems: input.lineItems.length
+    ? input.lineItems.map((line) =>
+        emptyLine({
+          id: line.id,
+          description: line.description,
+          quantity: String(line.quantity),
+          unitPrice: String(line.unitPrice),
+          accountCode: line.accountCode,
+        })
+      )
+    : [emptyLine()],
 })
+
+export const formFromInvoice = (invoice: Invoice): InvoiceFormValues => formFromInput(invoice)
 
 // a blank field stays not-a-number so validation can tell empty apart from a real 0
 export const parseNumber = (value: string) => (value.trim() === '' ? Number.NaN : Number(value.replace(/,/g, '')))
