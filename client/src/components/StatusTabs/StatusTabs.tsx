@@ -1,5 +1,6 @@
 import { STATUS_TABS, type InvoiceFilter } from '../../hooks/useInvoiceFilters'
 import type { DisplayStatus } from '../../types/invoice'
+import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden'
 import { Count, Tab, TabList } from './StatusTabs.styled'
 
 interface StatusTabsProp {
@@ -9,13 +10,17 @@ interface StatusTabsProp {
 }
 
 export const StatusTabs = ({ value, counts, onChange }: StatusTabsProp) => (
-  <TabList>
+  <TabList role="group" aria-label="Filter by status">
     {STATUS_TABS.map((tab) => {
       const active = tab.value === value
       return (
-        <Tab key={tab.value} type="button" $active={active} onClick={() => onChange(tab.value)}>
+        <Tab key={tab.value} type="button" aria-pressed={active} $active={active} onClick={() => onChange(tab.value)}>
           {tab.label}
-          <Count $active={active}>{counts[tab.value as 'all' | DisplayStatus]}</Count>
+          <Count $active={active}>
+            <VisuallyHidden>(</VisuallyHidden>
+            {counts[tab.value as 'all' | DisplayStatus]}
+            <VisuallyHidden>)</VisuallyHidden>
+          </Count>
         </Tab>
       )
     })}

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useFocusOnReady } from '../../hooks/useFocusOnReady'
 import { paths } from '../../hooks/useHashRoute'
 import { useInvoice } from '../../hooks/useInvoice'
 import { useInvoiceActions } from '../../hooks/useInvoiceActions'
@@ -68,6 +69,7 @@ const bannerFor = (invoice: Invoice, due: DueInfo): { tone: BannerTone; text: st
 export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onDeleted }: InvoiceDetailPageProp) => {
   const { invoice, status, error, setInvoice, reload } = useInvoice(id)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const headingRef = useFocusOnReady<HTMLHeadingElement>(status === 'success')
   const actions = useInvoiceActions({
     onUpdated: (updated) => {
       setInvoice(updated)
@@ -109,7 +111,9 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onD
       <Header>
         <div>
           <TitleRow>
-            <Title>{invoice.invoiceNumber}</Title>
+            <Title ref={headingRef} tabIndex={-1}>
+              {invoice.invoiceNumber}
+            </Title>
             <StatusBadge status={displayStatus(invoice)} />
           </TitleRow>
           <Meta>

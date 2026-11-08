@@ -1,5 +1,21 @@
 import styled from 'styled-components'
 
+export const SkipLink = styled.a`
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  z-index: 100;
+  padding: 8px 12px;
+  border-radius: ${({ theme }) => theme.radius.md};
+  background: ${({ theme }) => theme.color.text};
+  color: #fff;
+  font-weight: 600;
+
+  &:focus {
+    top: 12px;
+  }
+`
+
 export const Shell = styled.div`
   min-height: 100vh;
   display: flex;
@@ -138,6 +154,7 @@ export const Avatar = styled.span`
 `
 
 export const Content = styled.main`
+  outline: none;
   padding: 24px ${({ theme }) => theme.layout.gutter} 48px;
 
   @media (max-width: 600px) {

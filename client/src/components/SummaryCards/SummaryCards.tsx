@@ -25,19 +25,26 @@ const amountOf = (invoices: Invoice[]) =>
 const countLabel = (count: number) => `${count} invoice${count === 1 ? '' : 's'}`
 
 export const SummaryCards = ({ groups, activeFilter, loading, onSelect }: SummaryCardsProp) => (
-  <Grid>
+  <Grid role="group" aria-label="Invoice summary. Choose a card to filter the table.">
     {SUMMARY_CARDS.map((card) => {
       const invoices = groups[card.group]
       const active = activeFilter === card.filter
       return (
         // clicking the active card again clears the filter
-        <Card key={card.filter} type="button" $active={active} $tone={card.group} onClick={() => onSelect(active ? 'all' : card.filter)}>
+        <Card
+          key={card.filter}
+          type="button"
+          aria-pressed={active}
+          $active={active}
+          $tone={card.group}
+          onClick={() => onSelect(active ? 'all' : card.filter)}
+        >
           <CardTop>
             <Label>
-              <Dot $tone={card.group} />
+              <Dot $tone={card.group} aria-hidden="true" />
               {card.label}
             </Label>
-            <Hint $active={active} $tone={card.group}>
+            <Hint $active={active} $tone={card.group} aria-hidden="true">
               {active ? 'Showing' : 'View'}
             </Hint>
           </CardTop>

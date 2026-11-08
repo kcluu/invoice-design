@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useInvoiceActions } from '../../hooks/useInvoiceActions'
-import { useInvoiceFilters } from '../../hooks/useInvoiceFilters'
+import { STATUS_TABS, useInvoiceFilters } from '../../hooks/useInvoiceFilters'
 import type { LoadStatus } from '../../hooks/useInvoices'
 import type { Invoice } from '../../types/invoice'
 import { Button } from '../Button/Button'
@@ -60,6 +60,8 @@ export const InvoiceListPage = ({
   const actions = useInvoiceActions({ onUpdated, onDeleted })
   const [deleting, setDeleting] = useState<Invoice | null>(null)
   const focus = filter === 'outstanding' || filter === 'dueSoon' ? FOCUS_NOTES[filter] : null
+  const viewLabel = focus?.label ?? STATUS_TABS.find((tab) => tab.value === filter)?.label ?? 'All'
+  const caption = `Invoices, ${viewLabel.toLowerCase()} view, ${visible.length} shown${query ? ` matching “${query}”` : ''}`
   const currencies = [...new Set(invoices.map((invoice) => invoice.currency))].join(', ')
 
   const confirmDelete = async () => {
@@ -98,7 +100,13 @@ export const InvoiceListPage = ({
             <circle cx="11" cy="11" r="7" />
             <path d="M20 20l-3.5-3.5" />
           </svg>
-          <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search number or customer" />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search number or customer"
+            aria-label="Search invoices by number or customer"
+          />
         </Search>
       </Toolbar>
 
@@ -129,6 +137,7 @@ export const InvoiceListPage = ({
         <InvoiceTable
           invoices={visible}
           asOfDate={asOfDate}
+          caption={caption}
           onOpen={onOpen}
           onEdit={onEdit}
           onAction={(invoice, action) => void actions.run(invoice, action)}

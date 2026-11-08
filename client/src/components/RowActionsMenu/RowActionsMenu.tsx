@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import type { InvoiceAction } from '../../hooks/useInvoiceActions'
+import { useMenu } from '../../hooks/useMenu'
 import type { Invoice } from '../../types/invoice'
 import { availableActions } from '../../utils/invoicePermissions'
 import { Divider, Menu, MenuItem, MenuNote, MenuWrap, Trigger } from './RowActionsMenu.styled'
@@ -13,54 +13,71 @@ interface RowActionsMenuProp {
 }
 
 export const RowActionsMenu = ({ invoice, onView, onEdit, onAction, onRequestDelete }: RowActionsMenuProp) => {
-  const [open, setOpen] = useState(false)
+  const menu = useMenu()
   const actions = availableActions(invoice)
+
+  // return focus to the trigger first so a dialog opened next can hand it back there
   const pick = (fn: () => void) => () => {
-    setOpen(false)
+    menu.close()
     fn()
   }
 
   return (
     <MenuWrap>
-      <Trigger type="button" title="Actions" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+      <Trigger
+        ref={menu.triggerRef}
+        type="button"
+        aria-label={`More actions for ${invoice.invoiceNumber}`}
+        aria-haspopup="menu"
+        aria-expanded={menu.open}
+        aria-controls={menu.open ? menu.menuId : undefined}
+        onClick={menu.toggle}
+        onKeyDown={menu.onTriggerKeyDown}
+      >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <circle cx="5" cy="12" r="1.8" />
           <circle cx="12" cy="12" r="1.8" />
           <circle cx="19" cy="12" r="1.8" />
         </svg>
       </Trigger>
-      {open && (
-        <Menu>
-          <MenuItem type="button" onClick={pick(onView)}>
+      {menu.open && (
+        <Menu
+          ref={menu.menuRef}
+          id={menu.menuId}
+          role="menu"
+          aria-label={`Actions for ${invoice.invoiceNumber}`}
+          onKeyDown={menu.onMenuKeyDown}
+        >
+          <MenuItem type="button" role="menuitem" tabIndex={-1} onClick={pick(onView)}>
             View invoice
           </MenuItem>
           {actions.canEdit && (
-            <MenuItem type="button" onClick={pick(onEdit)}>
+            <MenuItem type="button" role="menuitem" tabIndex={-1} onClick={pick(onEdit)}>
               Edit
             </MenuItem>
           )}
           {actions.canSend && (
-            <MenuItem type="button" onClick={pick(() => onAction('send'))}>
+            <MenuItem type="button" role="menuitem" tabIndex={-1} onClick={pick(() => onAction('send'))}>
               Send
             </MenuItem>
           )}
           {actions.canRecordPayment && (
-            <MenuItem type="button" onClick={pick(() => onAction('recordPayment'))}>
+            <MenuItem type="button" role="menuitem" tabIndex={-1} onClick={pick(() => onAction('recordPayment'))}>
               Record payment
             </MenuItem>
           )}
           {actions.canVoid && (
-            <MenuItem type="button" onClick={pick(() => onAction('void'))}>
+            <MenuItem type="button" role="menuitem" tabIndex={-1} onClick={pick(() => onAction('void'))}>
               Void
             </MenuItem>
           )}
-          <Divider />
+          <Divider role="separator" />
           {actions.canDelete ? (
-            <MenuItem type="button" $danger onClick={pick(onRequestDelete)}>
+            <MenuItem type="button" role="menuitem" tabIndex={-1} $danger onClick={pick(onRequestDelete)}>
               Delete
             </MenuItem>
           ) : (
-            <MenuNote>Paid invoices can’t be deleted. Reverse the payment first.</MenuNote>
+            <MenuNote role="none">Paid invoices can’t be deleted. Reverse the payment first.</MenuNote>
           )}
         </Menu>
       )}

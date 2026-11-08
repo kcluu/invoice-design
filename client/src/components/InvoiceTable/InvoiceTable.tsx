@@ -6,11 +6,13 @@ import { computeTotals } from '../../utils/invoiceTotals'
 import { formatMoney } from '../../utils/money'
 import { RowActionsMenu } from '../RowActionsMenu/RowActionsMenu'
 import { StatusBadge } from '../StatusBadge/StatusBadge'
-import { DueLabel, Empty, NumberButton, Primary, Row, Secondary, Table, TableWrap, Td, Th } from './InvoiceTable.styled'
+import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden'
+import { Caption, DueLabel, Empty, NumberButton, Primary, Row, Secondary, Table, TableWrap, Td, Th } from './InvoiceTable.styled'
 
 interface InvoiceTableProp {
   invoices: Invoice[]
   asOfDate: string
+  caption: string
   onOpen: (id: string) => void
   onEdit: (id: string) => void
   onAction: (invoice: Invoice, action: Exclude<InvoiceAction, 'delete'>) => void
@@ -25,21 +27,26 @@ const balanceNote = (invoice: Invoice, total: number) => {
   return 'No balance'
 }
 
-export const InvoiceTable = ({ invoices, asOfDate, onOpen, onEdit, onAction, onRequestDelete }: InvoiceTableProp) => {
-  if (!invoices.length) return <Empty>No invoices match this view.</Empty>
+export const InvoiceTable = ({ invoices, asOfDate, caption, onOpen, onEdit, onAction, onRequestDelete }: InvoiceTableProp) => {
+  if (!invoices.length) return <Empty role="status">No invoices match this view.</Empty>
 
   return (
     <TableWrap>
       <Table>
+        <Caption>{caption}</Caption>
         <thead>
           <tr>
-            <Th>Invoice</Th>
-            <Th>Customer</Th>
-            <Th>Issued</Th>
-            <Th>Due</Th>
-            <Th>Status</Th>
-            <Th $align="right">Amount</Th>
-            <Th>Actions</Th>
+            <Th scope="col">Invoice</Th>
+            <Th scope="col">Customer</Th>
+            <Th scope="col">Issued</Th>
+            <Th scope="col">Due</Th>
+            <Th scope="col">Status</Th>
+            <Th scope="col" $align="right">
+              Amount
+            </Th>
+            <Th scope="col">
+              <VisuallyHidden>Actions</VisuallyHidden>
+            </Th>
           </tr>
         </thead>
         <tbody>

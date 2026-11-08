@@ -1,3 +1,5 @@
+import { useId, useRef } from 'react'
+import { useFocusTrap } from '../../hooks/useFocusTrap'
 import type { Invoice } from '../../types/invoice'
 import { displayStatus } from '../../utils/invoiceStatus'
 import { computeTotals } from '../../utils/invoiceTotals'
@@ -21,20 +23,30 @@ export const deleteMessage = (invoice: Invoice) => {
 }
 
 export const ConfirmDeleteDialog = ({ invoice, busy, onCancel, onConfirm, onVoidInstead }: ConfirmDeleteDialogProp) => {
+  const panelRef = useRef<HTMLDivElement>(null)
+  const titleId = useId()
+  const bodyId = useId()
   const canVoid = invoice.status === 'Sent'
 
+  // start on cancel, the safe choice for a destructive dialog
+  useFocusTrap(panelRef, { onEscape: busy ? undefined : onCancel, initialFocus: '[data-autofocus]' })
+
   return (
-    <Backdrop>
-      <Panel role="dialog">
-        <Title>Delete {invoice.invoiceNumber}?</Title>
-        <Body>{deleteMessage(invoice)}</Body>
+    <Backdrop
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget && !busy) onCancel()
+      }}
+    >
+      <Panel ref={panelRef} role="alertdialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={bodyId} aria-busy={busy}>
+        <Title id={titleId}>Delete {invoice.invoiceNumber}?</Title>
+        <Body id={bodyId}>{deleteMessage(invoice)}</Body>
         <Summary>
           <span>{invoice.customerName}</span>
           <strong>{formatMoney(computeTotals(invoice).total, invoice.currency)}</strong>
         </Summary>
         <FinePrint>This can’t be undone. The deletion is kept in the audit trail.</FinePrint>
         <Footer>
-          <Button onClick={onCancel} disabled={busy}>
+          <Button data-autofocus onClick={onCancel} disabled={busy}>
             Cancel
           </Button>
           {canVoid && (

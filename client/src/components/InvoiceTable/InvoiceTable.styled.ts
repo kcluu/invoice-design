@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { visuallyHidden } from '../VisuallyHidden/VisuallyHidden.styled'
 import type { DueTone } from '../../utils/invoiceStatus'
 
 export const TableWrap = styled.div`
@@ -12,6 +13,10 @@ export const Table = styled.table`
   min-width: 860px;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
+`
+
+export const Caption = styled.caption`
+  ${visuallyHidden}
 `
 
 export const Th = styled.th<{ $align?: 'left' | 'right' }>`

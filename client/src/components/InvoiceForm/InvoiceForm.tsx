@@ -1,3 +1,4 @@
+import { useFocusOnReady } from '../../hooks/useFocusOnReady'
 import { useInvoiceForm, type InvoiceFormValues } from '../../hooks/useInvoiceForm'
 import { useSaveInvoice } from '../../hooks/useSaveInvoice'
 import { CURRENCIES, PAYMENT_TERMS, type Invoice, type PaymentTerms } from '../../types/invoice'
@@ -37,6 +38,7 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
   const { values, setField, errors } = form
   const { save, saving, error } = useSaveInvoice()
   const locked = invoice ? availableActions(invoice).isLocked : false
+  const headingRef = useFocusOnReady<HTMLHeadingElement>(true)
   const money = (amount: number) => formatMoney(amount, values.currency)
 
   // wires an input to its inline error message
@@ -63,7 +65,9 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
       }}
     >
       <div>
-        <Title>{invoice ? `Edit ${invoice.invoiceNumber}` : 'New invoice'}</Title>
+        <Title ref={headingRef} tabIndex={-1}>
+          {invoice ? `Edit ${invoice.invoiceNumber}` : 'New invoice'}
+        </Title>
         <Subtitle>
           {invoice ? `${invoice.customerName} · ${invoice.status}` : 'Creates a draft you can review before it goes to the customer.'}
         </Subtitle>

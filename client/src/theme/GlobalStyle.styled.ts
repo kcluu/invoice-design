@@ -27,4 +27,15 @@ export const GlobalStyle = createGlobalStyle`
   a {
     color: ${({ theme }) => theme.color.accent};
   }
+
+  :focus-visible {
+    outline: 2px solid ${({ theme }) => theme.color.accent};
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+    }
+  }
 `

@@ -83,9 +83,9 @@ describe('InvoiceListPage', () => {
     const props = renderPage()
 
     const row = bodyRows().find((item) => within(item).queryByText('Brightline Health'))!
-    await user.click(within(row).getByRole('button', { name: 'Actions' }))
-    await user.click(within(row).getByRole('button', { name: 'Delete' }))
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Delete invoice' }))
+    await user.click(within(row).getByRole('button', { name: /more actions for INV-2026-0413/i }))
+    await user.click(within(row).getByRole('menuitem', { name: 'Delete' }))
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Delete invoice' }))
 
     await waitFor(() => expect(props.onDeleted).toHaveBeenCalledWith(brightline))
     expect(fetchMock).toHaveBeenCalledWith(`/api/invoices/${brightline.id}`, expect.objectContaining({ method: 'DELETE' }))

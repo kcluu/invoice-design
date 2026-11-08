@@ -39,6 +39,10 @@ export const Title = styled.h1`
   font-size: ${({ theme }) => theme.font.size.xxl};
   font-weight: 600;
   letter-spacing: -0.01em;
+
+  &:focus {
+    outline: none;
+  }
 `
 
 export const Subtitle = styled.p`
