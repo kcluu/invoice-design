@@ -1,23 +1,23 @@
-import styled from 'styled-components'
-import { visuallyHidden } from '../VisuallyHidden/VisuallyHidden.styled'
-import type { DueTone } from '../../utils/invoiceStatus'
+import styled from 'styled-components';
+import { visuallyHidden } from '../VisuallyHidden/VisuallyHidden.styled';
+import type { DueTone } from '../../utils/invoiceStatus';
 
 export const TableWrap = styled.div`
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: ${({ theme }) => theme.radius.lg};
   overflow-x: auto;
-`
+`;
 
 export const Table = styled.table`
   width: 100%;
   min-width: 860px;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
-`
+`;
 
 export const Caption = styled.caption`
   ${visuallyHidden}
-`
+`;
 
 export const Th = styled.th<{ $align?: 'left' | 'right' }>`
   padding: 10px 12px;
@@ -27,7 +27,7 @@ export const Th = styled.th<{ $align?: 'left' | 'right' }>`
   color: ${({ theme }) => theme.color.textMuted};
   border-bottom: 1px solid ${({ theme }) => theme.color.border};
   white-space: nowrap;
-`
+`;
 
 export const Row = styled.tr`
   &:hover td {
@@ -37,14 +37,14 @@ export const Row = styled.tr`
   &:last-child td {
     border-bottom: none;
   }
-`
+`;
 
 export const Td = styled.td<{ $align?: 'left' | 'right' }>`
   padding: 12px;
   text-align: ${({ $align = 'left' }) => $align};
   vertical-align: top;
   border-bottom: 1px solid ${({ theme }) => theme.color.divider};
-`
+`;
 
 export const NumberButton = styled.button`
   all: unset;
@@ -57,11 +57,11 @@ export const NumberButton = styled.button`
   &:hover {
     text-decoration-color: currentColor;
   }
-`
+`;
 
 export const Primary = styled.div`
   font-weight: 500;
-`
+`;
 
 export const Secondary = styled.div`
   margin-top: 2px;
@@ -71,12 +71,12 @@ export const Secondary = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-`
+`;
 
 export const DueLabel = styled.div<{ $tone: DueTone }>`
   font-weight: ${({ $tone }) => ($tone === 'soon' || $tone === 'late' ? 600 : 500)};
   color: ${({ theme, $tone }) => theme.tone[$tone]};
-`
+`;
 
 export const Empty = styled.p`
   padding: 48px 16px;
@@ -84,4 +84,4 @@ export const Empty = styled.p`
   color: ${({ theme }) => theme.color.textMuted};
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: ${({ theme }) => theme.radius.lg};
-`
+`;

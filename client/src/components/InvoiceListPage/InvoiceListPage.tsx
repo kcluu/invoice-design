@@ -1,15 +1,16 @@
-import { useState } from 'react'
-import { useInvoiceActions } from '../../hooks/useInvoiceActions'
-import { STATUS_TABS, useInvoiceFilters } from '../../hooks/useInvoiceFilters'
-import type { LoadStatus } from '../../hooks/useInvoices'
-import type { Invoice } from '../../types/invoice'
-import { Button } from '../Button/Button'
-import { ConfirmDeleteDialog } from '../ConfirmDeleteDialog/ConfirmDeleteDialog'
-import { ErrorState } from '../ErrorState/ErrorState'
-import { InvoiceTable } from '../InvoiceTable/InvoiceTable'
-import { InvoiceTableSkeleton } from '../InvoiceTableSkeleton/InvoiceTableSkeleton'
-import { StatusTabs } from '../StatusTabs/StatusTabs'
-import { SummaryCards } from '../SummaryCards/SummaryCards'
+import { useState } from 'react';
+import { useInvoiceActions } from '../../hooks/useInvoiceActions';
+import { STATUS_TABS, useInvoiceFilters } from '../../hooks/useInvoiceFilters';
+import type { LoadStatus } from '../../hooks/useInvoices';
+import type { Invoice } from '../../types/invoice';
+import { Button } from '../Button/Button';
+import { ConfirmDeleteDialog } from '../ConfirmDeleteDialog/ConfirmDeleteDialog';
+import { ErrorState } from '../ErrorState/ErrorState';
+import { Icon } from '../Icon/Icon';
+import { InvoiceTable } from '../InvoiceTable/InvoiceTable';
+import { InvoiceTableSkeleton } from '../InvoiceTableSkeleton/InvoiceTableSkeleton';
+import { StatusTabs } from '../StatusTabs/StatusTabs';
+import { SummaryCards } from '../SummaryCards/SummaryCards';
 import {
   Banner,
   FocusChip,
@@ -23,28 +24,28 @@ import {
   Title,
   TitleBlock,
   Toolbar,
-} from './InvoiceListPage.styled'
+} from './InvoiceListPage.styled';
 
 interface InvoiceListPageProp {
-  invoices: Invoice[]
-  status: LoadStatus
-  error: string | null
-  asOfDate: string
-  onOpen: (id: string) => void
-  onEdit: (id: string) => void
-  onCreate: () => void
-  onDraftFromText: () => void
-  onRetry: () => void
-  onUpdated: (invoice: Invoice) => void
-  onDeleted: (invoice: Invoice) => void
-  onNotify: (message: string) => void
+  invoices: Invoice[];
+  status: LoadStatus;
+  error: string | null;
+  asOfDate: string;
+  onOpen: (id: string) => void;
+  onEdit: (id: string) => void;
+  onCreate: () => void;
+  onDraftFromText: () => void;
+  onRetry: () => void;
+  onUpdated: (invoice: Invoice) => void;
+  onDeleted: (invoice: Invoice) => void;
+  onNotify: (message: string) => void;
 }
 
 // the two summary views with no matching tab get a short explanation above the table
 const FOCUS_NOTES = {
   outstanding: { label: 'Outstanding', note: 'Sent and unpaid, soonest due first.' },
   dueSoon: { label: 'Due in next 14 days', note: 'Open invoices coming due, soonest first.' },
-} as const
+} as const;
 
 export const InvoiceListPage = ({
   invoices,
@@ -60,21 +61,17 @@ export const InvoiceListPage = ({
   onDeleted,
   onNotify,
 }: InvoiceListPageProp) => {
-  const { filter, setFilter, query, setQuery, visible, counts, groups } = useInvoiceFilters(invoices, asOfDate)
-  const actions = useInvoiceActions({ onUpdated, onDeleted, onNotify })
-  const [deleting, setDeleting] = useState<Invoice | null>(null)
-  const focus = filter === 'outstanding' || filter === 'dueSoon' ? FOCUS_NOTES[filter] : null
-  const viewLabel = focus?.label ?? STATUS_TABS.find((tab) => tab.value === filter)?.label ?? 'All'
-  const caption = `Invoices, ${viewLabel.toLowerCase()} view, ${visible.length} shown${query ? ` matching “${query}”` : ''}`
-  const currencies = [...new Set(invoices.map((invoice) => invoice.currency))].join(', ')
+  const { filter, setFilter, query, setQuery, visible, counts, groups } = useInvoiceFilters(invoices, asOfDate);
+  const actions = useInvoiceActions({ onUpdated, onDeleted, onNotify });
+  const [deleting, setDeleting] = useState<Invoice | null>(null);
+  const focus = filter === 'outstanding' || filter === 'dueSoon' ? FOCUS_NOTES[filter] : null;
+  const viewLabel = focus?.label ?? STATUS_TABS.find((tab) => tab.value === filter)?.label ?? 'All';
+  const caption = `Invoices, ${viewLabel.toLowerCase()} view, ${visible.length} shown${query ? ` matching “${query}”` : ''}`;
+  const currencies = [...new Set(invoices.map((invoice) => invoice.currency))].join(', ');
 
   const confirmDelete = async () => {
-    if (deleting && (await actions.run(deleting, 'delete'))) setDeleting(null)
-  }
-
-  const voidInstead = async () => {
-    if (deleting && (await actions.run(deleting, 'void'))) setDeleting(null)
-  }
+    if (deleting && (await actions.run(deleting, 'delete'))) setDeleting(null);
+  };
 
   return (
     <Page>
@@ -87,9 +84,7 @@ export const InvoiceListPage = ({
         </TitleBlock>
         <HeaderActions>
           <Button onClick={onDraftFromText}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-              <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z" />
-            </svg>
+            <Icon name="sparkle" size={15} />
             Draft from text
           </Button>
           <Button variant="primary" onClick={onCreate}>
@@ -142,7 +137,7 @@ export const InvoiceListPage = ({
       )}
 
       {status === 'loading' && <InvoiceTableSkeleton />}
-      {status === 'error' && <ErrorState title="Couldn’t load invoices" message={error ?? 'Something went wrong.'} onRetry={onRetry} />}
+      {status === 'error' && <ErrorState title="Couldn't load invoices" message={error ?? 'Something went wrong.'} onRetry={onRetry} />}
       {status === 'success' && (
         <InvoiceTable
           invoices={visible}
@@ -161,9 +156,8 @@ export const InvoiceListPage = ({
           busy={actions.pending?.id === deleting.id}
           onCancel={() => setDeleting(null)}
           onConfirm={() => void confirmDelete()}
-          onVoidInstead={() => void voidInstead()}
         />
       )}
     </Page>
-  )
-}
+  );
+};

@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const Panel = styled.section`
   display: flex;
@@ -8,7 +8,7 @@ export const Panel = styled.section`
   border-radius: ${({ theme }) => theme.radius.lg};
   border: 1px solid #d5e2da;
   background: #f5f9f7;
-`
+`;
 
 export const Heading = styled.h2`
   display: flex;
@@ -17,11 +17,11 @@ export const Heading = styled.h2`
   font-size: ${({ theme }) => theme.font.size.md};
   font-weight: 600;
   color: ${({ theme }) => theme.color.accent};
-`
+`;
 
 export const Label = styled.label`
   color: #3d3d3b;
-`
+`;
 
 export const TextArea = styled.textarea`
   min-height: 84px;
@@ -37,7 +37,7 @@ export const TextArea = styled.textarea`
     border-color: ${({ theme }) => theme.color.accent};
     box-shadow: 0 0 0 1px ${({ theme }) => theme.color.accent};
   }
-`
+`;
 
 export const Row = styled.div`
   display: flex;
@@ -45,7 +45,7 @@ export const Row = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-`
+`;
 
 export const Examples = styled.div`
   display: flex;
@@ -54,7 +54,7 @@ export const Examples = styled.div`
   gap: 6px;
   font-size: ${({ theme }) => theme.font.size.sm};
   color: ${({ theme }) => theme.color.textSecondary};
-`
+`;
 
 export const Chip = styled.button`
   min-height: 30px;
@@ -71,7 +71,7 @@ export const Chip = styled.button`
     opacity: 0.6;
     cursor: not-allowed;
   }
-`
+`;
 
 export const Loading = styled.div`
   display: flex;
@@ -81,7 +81,7 @@ export const Loading = styled.div`
   border-top: 1px solid #d5e2da;
   font-size: ${({ theme }) => theme.font.size.sm};
   color: #3d5a4c;
-`
+`;
 
 export const Review = styled.div`
   padding-top: 10px;
@@ -101,15 +101,15 @@ export const Review = styled.div`
     flex-direction: column;
     gap: 4px;
   }
-`
+`;
 
 export const Success = styled.p`
   padding-top: 10px;
   border-top: 1px solid #d5e2da;
   color: #1e6b43;
   font-weight: 500;
-`
+`;
 
 export const ErrorText = styled.p`
   color: ${({ theme }) => theme.color.danger};
-`
+`;

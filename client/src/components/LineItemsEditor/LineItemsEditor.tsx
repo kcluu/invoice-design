@@ -1,23 +1,26 @@
-import type { LineDraft } from '../../hooks/useInvoiceForm'
-import { REVENUE_ACCOUNTS, type FieldErrors } from '../../types/invoice'
-import { fieldId } from '../../utils/fieldId'
-import { lineAmount } from '../../utils/invoiceTotals'
-import { formatMoney } from '../../utils/money'
-import { Button } from '../Button/Button'
-import { FieldError } from '../FieldError/FieldError'
-import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden'
-import { AddRow, Amount, RemoveButton, Table, TableScroll, Td, Th, Wrap } from './LineItemsEditor.styled'
+import type { LineDraft } from '../../hooks/useInvoiceForm';
+import { REVENUE_ACCOUNTS, type FieldErrors } from '../../types/invoice';
+import { fieldId } from '../../utils/fieldId';
+import { lineAmount } from '../../utils/invoiceTotals';
+import { formatMoney } from '../../utils/money';
+import { Button } from '../Button/Button';
+import { FieldError } from '../FieldError/FieldError';
+import { Select } from '../Select/Select';
+import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden';
+import { AddRow, Amount, RemoveButton, Table, TableScroll, Td, Th, Wrap } from './LineItemsEditor.styled';
 
-type LineField = 'description' | 'quantity' | 'unitPrice' | 'accountCode'
+const ACCOUNT_OPTIONS = REVENUE_ACCOUNTS.map((account) => ({ value: account.code, label: account.code, detail: account.name }));
+
+type LineField = 'description' | 'quantity' | 'unitPrice' | 'accountCode';
 
 interface LineItemsEditorProp {
-  lines: LineDraft[]
-  currency: string
-  disabled: boolean
-  errors: FieldErrors
-  onChange: (key: string, field: LineField, value: string) => void
-  onAdd: () => void
-  onRemove: (key: string) => void
+  lines: LineDraft[];
+  currency: string;
+  disabled: boolean;
+  errors: FieldErrors;
+  onChange: (key: string, field: LineField, value: string) => void;
+  onAdd: () => void;
+  onRemove: (key: string) => void;
 }
 
 const LINE_LABELS: Record<LineField, string> = {
@@ -25,14 +28,14 @@ const LINE_LABELS: Record<LineField, string> = {
   accountCode: 'Revenue account',
   quantity: 'Quantity',
   unitPrice: 'Unit price',
-}
+};
 
-const amountOf = (line: LineDraft) => lineAmount({ quantity: Number(line.quantity) || 0, unitPrice: Number(line.unitPrice) || 0 })
+const amountOf = (line: LineDraft) => lineAmount({ quantity: Number(line.quantity) || 0, unitPrice: Number(line.unitPrice) || 0 });
 
 export const LineItemsEditor = ({ lines, currency, disabled, errors, onChange, onAdd, onRemove }: LineItemsEditorProp) => {
   // server and client both key line errors by line position and field name
   const fieldProps = (index: number, field: LineField) => {
-    const key = `lineItems.${index}.${field}`
+    const key = `lineItems.${index}.${field}`;
     return {
       id: fieldId(key),
       // the column header isn't a label, so name each input with its line number
@@ -40,12 +43,12 @@ export const LineItemsEditor = ({ lines, currency, disabled, errors, onChange, o
       'aria-required': field === 'accountCode' ? undefined : true,
       'aria-invalid': errors[key] ? true : undefined,
       'aria-describedby': errors[key] ? `${key}-error` : undefined,
-    }
-  }
+    };
+  };
   const errorFor = (index: number, field: LineField) => {
-    const key = `lineItems.${index}.${field}`
-    return <FieldError id={`${key}-error`} message={errors[key]} />
-  }
+    const key = `lineItems.${index}.${field}`;
+    return <FieldError id={`${key}-error`} message={errors[key]} />;
+  };
 
   return (
     <Wrap>
@@ -85,18 +88,14 @@ export const LineItemsEditor = ({ lines, currency, disabled, errors, onChange, o
                   {errorFor(index, 'description')}
                 </Td>
                 <Td>
-                  <select
+                  <Select
                     {...fieldProps(index, 'accountCode')}
+                    size="sm"
                     value={line.accountCode}
+                    options={ACCOUNT_OPTIONS}
                     disabled={disabled}
-                    onChange={(event) => onChange(line.key, 'accountCode', event.target.value)}
-                  >
-                    {REVENUE_ACCOUNTS.map((account) => (
-                      <option key={account.code} value={account.code}>
-                        {account.code} {account.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(value) => onChange(line.key, 'accountCode', value)}
+                  />
                 </Td>
                 <Td>
                   <input
@@ -147,5 +146,5 @@ export const LineItemsEditor = ({ lines, currency, disabled, errors, onChange, o
         </AddRow>
       )}
     </Wrap>
-  )
-}
+  );
+};

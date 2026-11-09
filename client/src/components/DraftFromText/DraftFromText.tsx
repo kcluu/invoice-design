@@ -1,19 +1,19 @@
-import { useId } from 'react'
-import { useDraftFromText } from '../../hooks/useDraftFromText'
-import type { DraftResult } from '../../types/invoice'
-import { Button } from '../Button/Button'
-import { Skeleton } from '../Skeleton/Skeleton'
-import { Chip, ErrorText, Examples, Heading, Label, Loading, Panel, Review, Row, Success, TextArea } from './DraftFromText.styled'
+import { useId } from 'react';
+import { useDraftFromText } from '../../hooks/useDraftFromText';
+import type { DraftResult } from '../../types/invoice';
+import { Button } from '../Button/Button';
+import { Skeleton } from '../Skeleton/Skeleton';
+import { Chip, ErrorText, Examples, Heading, Label, Loading, Panel, Review, Row, Success, TextArea } from './DraftFromText.styled';
 
 interface DraftFromTextProp {
-  onDraft: (result: DraftResult) => void
+  onDraft: (result: DraftResult) => void;
 }
 
 export const DraftFromText = ({ onDraft }: DraftFromTextProp) => {
-  const { text, setText, status, error, needsReview, examples, run } = useDraftFromText({ onDraft })
-  const headingId = useId()
-  const inputId = useId()
-  const drafting = status === 'drafting'
+  const { text, setText, status, error, needsReview, examples, run } = useDraftFromText({ onDraft });
+  const headingId = useId();
+  const inputId = useId();
+  const drafting = status === 'drafting';
 
   // the outcome sits in a polite live region so it is read out without moving focus
   return (
@@ -81,5 +81,5 @@ export const DraftFromText = ({ onDraft }: DraftFromTextProp) => {
         {status === 'done' && needsReview.length === 0 && <Success>Draft filled in. Everything the request asked for was found.</Success>}
       </div>
     </Panel>
-  )
-}
+  );
+};

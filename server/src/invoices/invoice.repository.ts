@@ -1,32 +1,32 @@
-import type { Pool } from 'pg'
-import type { ActivityEntry, Invoice, InvoiceStatus, LineItem, PaymentStatus, PaymentTerms } from './invoice.types'
+import type { Pool } from 'pg';
+import type { ActivityEntry, Invoice, InvoiceStatus, LineItem, PaymentStatus, PaymentTerms } from './invoice.types';
 
 export interface InvoiceRepository {
-  list(): Promise<Invoice[]>
-  findById(id: string): Promise<Invoice | null>
-  insert(invoice: Invoice): Promise<Invoice>
-  update(invoice: Invoice): Promise<Invoice>
-  remove(id: string): Promise<boolean>
+  list(): Promise<Invoice[]>;
+  findById(id: string): Promise<Invoice | null>;
+  insert(invoice: Invoice): Promise<Invoice>;
+  update(invoice: Invoice): Promise<Invoice>;
+  remove(id: string): Promise<boolean>;
 }
 
 interface InvoiceRow {
-  id: string
-  invoice_number: string
-  customer_name: string
-  billing_email: string
-  billing_address: string
-  payment_terms: PaymentTerms
-  status: InvoiceStatus
-  payment_status: PaymentStatus
-  currency: string
-  issue_date: string
-  due_date: string
-  paid_date: string | null
-  memo: string
-  tax_rate: string
-  discount: string
-  line_items: LineItem[]
-  activity: ActivityEntry[]
+  id: string;
+  invoice_number: string;
+  customer_name: string;
+  billing_email: string;
+  billing_address: string;
+  payment_terms: PaymentTerms;
+  status: InvoiceStatus;
+  payment_status: PaymentStatus;
+  currency: string;
+  issue_date: string;
+  due_date: string;
+  paid_date: string | null;
+  memo: string;
+  tax_rate: string;
+  discount: string;
+  line_items: LineItem[];
+  activity: ActivityEntry[];
 }
 
 // numeric columns come back from pg as strings
@@ -48,7 +48,7 @@ const fromRow = (row: InvoiceRow): Invoice => ({
   discount: Number(row.discount),
   lineItems: row.line_items,
   activity: row.activity,
-})
+});
 
 const toParams = (invoice: Invoice) => [
   invoice.id,
@@ -68,17 +68,17 @@ const toParams = (invoice: Invoice) => [
   invoice.discount,
   JSON.stringify(invoice.lineItems),
   JSON.stringify(invoice.activity),
-]
+];
 
 export const createPgRepository = (db: Pool): InvoiceRepository => ({
   async list() {
-    const { rows } = await db.query<InvoiceRow>('select * from invoices order by issue_date desc, invoice_number desc')
-    return rows.map(fromRow)
+    const { rows } = await db.query<InvoiceRow>('select * from invoices order by issue_date desc, invoice_number desc');
+    return rows.map(fromRow);
   },
 
   async findById(id) {
-    const { rows } = await db.query<InvoiceRow>('select * from invoices where id = $1', [id])
-    return rows[0] ? fromRow(rows[0]) : null
+    const { rows } = await db.query<InvoiceRow>('select * from invoices where id = $1', [id]);
+    return rows[0] ? fromRow(rows[0]) : null;
   },
 
   async insert(invoice) {
@@ -89,8 +89,8 @@ export const createPgRepository = (db: Pool): InvoiceRepository => ({
       ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       returning *`,
       toParams(invoice)
-    )
-    return fromRow(rows[0])
+    );
+    return fromRow(rows[0]);
   },
 
   async update(invoice) {
@@ -102,12 +102,12 @@ export const createPgRepository = (db: Pool): InvoiceRepository => ({
       where id = $1
       returning *`,
       toParams(invoice)
-    )
-    return fromRow(rows[0])
+    );
+    return fromRow(rows[0]);
   },
 
   async remove(id) {
-    const result = await db.query('delete from invoices where id = $1', [id])
-    return (result.rowCount ?? 0) > 0
+    const result = await db.query('delete from invoices where id = $1', [id]);
+    return (result.rowCount ?? 0) > 0;
   },
-})
+});

@@ -1,7 +1,7 @@
-import styled, { css } from 'styled-components'
+import styled, { css } from 'styled-components';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost'
-export type ButtonSize = 'sm' | 'md'
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
+export type ButtonSize = 'sm' | 'md';
 
 const variants = {
   primary: css`
@@ -42,7 +42,7 @@ const variants = {
       background: ${({ theme }) => theme.color.surfaceMuted};
     }
   `,
-}
+};
 
 export const StyledButton = styled.button<{ $variant: ButtonVariant; $size: ButtonSize }>`
   display: inline-flex;
@@ -70,4 +70,4 @@ export const StyledButton = styled.button<{ $variant: ButtonVariant; $size: Butt
   svg {
     flex: none;
   }
-`
+`;

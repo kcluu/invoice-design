@@ -1,9 +1,9 @@
-import type { Invoice } from '../types/invoice'
+import type { Invoice } from '../types/invoice';
 
-let counter = 500
+let counter = 500;
 
 export const buildInvoice = (overrides: Partial<Invoice> = {}): Invoice => {
-  counter += 1
+  counter += 1;
   return {
     id: `inv-2026-0${counter}`,
     invoiceNumber: `INV-2026-0${counter}`,
@@ -23,5 +23,5 @@ export const buildInvoice = (overrides: Partial<Invoice> = {}): Invoice => {
     lineItems: [{ id: `li-${counter}`, description: 'Platform subscription', quantity: 1, unitPrice: 12000, accountCode: '4000' }],
     activity: [{ id: `act-${counter}`, timestamp: '2026-04-28T10:14:00-04:00', actor: 'Maya Chen', action: 'Created invoice' }],
     ...overrides,
-  }
-}
+  };
+};

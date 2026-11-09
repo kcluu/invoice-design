@@ -1,25 +1,25 @@
-import { useMemo } from 'react'
-import { paths } from '../../hooks/useHashRoute'
-import { emptyForm, formFromInvoice } from '../../hooks/useInvoiceForm'
-import { useInvoice } from '../../hooks/useInvoice'
-import type { Invoice } from '../../types/invoice'
-import type { CustomerProfile } from '../../utils/customers'
-import { ErrorState } from '../ErrorState/ErrorState'
-import { InvoiceDetailSkeleton } from '../InvoiceDetailSkeleton/InvoiceDetailSkeleton'
-import { InvoiceForm } from '../InvoiceForm/InvoiceForm'
+import { useMemo } from 'react';
+import { paths } from '../../hooks/useHashRoute';
+import { emptyForm, formFromInvoice } from '../../hooks/useInvoiceForm';
+import { useInvoice } from '../../hooks/useInvoice';
+import type { Invoice } from '../../types/invoice';
+import type { CustomerProfile } from '../../utils/customers';
+import { ErrorState } from '../ErrorState/ErrorState';
+import { InvoiceDetailSkeleton } from '../InvoiceDetailSkeleton/InvoiceDetailSkeleton';
+import { InvoiceForm } from '../InvoiceForm/InvoiceForm';
 
 interface InvoiceFormPageProp {
-  invoiceId: string | null
-  customers: CustomerProfile[]
-  asOfDate: string
-  onSaved: (invoice: Invoice) => void
-  onCancel: () => void
-  startWithDraft?: boolean
+  invoiceId: string | null;
+  customers: CustomerProfile[];
+  asOfDate: string;
+  onSaved: (invoice: Invoice) => void;
+  onCancel: () => void;
+  startWithDraft?: boolean;
 }
 
 export const InvoiceFormPage = ({ invoiceId, customers, asOfDate, onSaved, onCancel, startWithDraft = false }: InvoiceFormPageProp) => {
-  const { invoice, status, error, reload } = useInvoice(invoiceId)
-  const createValues = useMemo(() => emptyForm(asOfDate), [asOfDate])
+  const { invoice, status, error, reload } = useInvoice(invoiceId);
+  const createValues = useMemo(() => emptyForm(asOfDate), [asOfDate]);
 
   if (!invoiceId) {
     return (
@@ -31,18 +31,18 @@ export const InvoiceFormPage = ({ invoiceId, customers, asOfDate, onSaved, onCan
         onSaved={onSaved}
         onCancel={onCancel}
       />
-    )
+    );
   }
-  if (status === 'loading') return <InvoiceDetailSkeleton />
+  if (status === 'loading') return <InvoiceDetailSkeleton />;
   if (status === 'error' || !invoice) {
     return (
       <ErrorState
-        title="Couldn’t load this invoice for editing"
+        title="Couldn't load this invoice for editing"
         message={error ?? 'Something went wrong.'}
         onRetry={() => void reload()}
         backHref={`#${paths.list()}`}
       />
-    )
+    );
   }
 
   // key resets the form state if a different invoice loads
@@ -55,5 +55,5 @@ export const InvoiceFormPage = ({ invoiceId, customers, asOfDate, onSaved, onCan
       onSaved={onSaved}
       onCancel={onCancel}
     />
-  )
-}
+  );
+};

@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const Region = styled.div`
   position: fixed;
@@ -7,7 +7,7 @@ export const Region = styled.div`
   z-index: 60;
   transform: translateX(-50%);
   max-width: calc(100% - 32px);
-`
+`;
 
 export const Bubble = styled.div`
   display: flex;
@@ -18,7 +18,7 @@ export const Bubble = styled.div`
   background: ${({ theme }) => theme.color.text};
   color: #fff;
   box-shadow: 0 8px 24px rgba(20, 20, 19, 0.25);
-`
+`;
 
 export const Dismiss = styled.button`
   width: 28px;
@@ -38,4 +38,4 @@ export const Dismiss = styled.button`
   &:focus-visible {
     outline-color: #fff;
   }
-`
+`;

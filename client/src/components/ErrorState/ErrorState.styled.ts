@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const Panel = styled.div`
   display: flex;
@@ -9,17 +9,17 @@ export const Panel = styled.div`
   text-align: center;
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: ${({ theme }) => theme.radius.lg};
-`
+`;
 
 export const Title = styled.h2`
   font-size: ${({ theme }) => theme.font.size.lg};
   font-weight: 600;
-`
+`;
 
 export const Message = styled.p`
   max-width: 420px;
   color: ${({ theme }) => theme.color.textSecondary};
-`
+`;
 
 export const Actions = styled.div`
   display: flex;
@@ -28,4 +28,4 @@ export const Actions = styled.div`
   justify-content: center;
   gap: 12px;
   margin-top: 8px;
-`
+`;

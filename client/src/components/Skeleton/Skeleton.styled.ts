@@ -1,9 +1,9 @@
-import styled, { keyframes } from 'styled-components'
+import styled, { keyframes } from 'styled-components';
 
 const pulse = keyframes`
   0%, 100% { opacity: 1; }
   50% { opacity: 0.45; }
-`
+`;
 
 export const Bar = styled.span<{ $width: string; $height: number; $radius: string }>`
   display: block;
@@ -16,4 +16,4 @@ export const Bar = styled.span<{ $width: string; $height: number; $radius: strin
   @media (prefers-reduced-motion: reduce) {
     animation: none;
   }
-`
+`;

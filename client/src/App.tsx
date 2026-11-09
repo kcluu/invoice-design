@@ -1,41 +1,42 @@
-import { useMemo, type ReactNode } from 'react'
-import { AppShell } from './components/AppShell/AppShell'
-import { Toast } from './components/Toast/Toast'
-import { InvoiceDetailPage } from './components/InvoiceDetailPage/InvoiceDetailPage'
-import { InvoiceFormPage } from './components/InvoiceFormPage/InvoiceFormPage'
-import { InvoiceListPage } from './components/InvoiceListPage/InvoiceListPage'
-import { paths, useHashRoute } from './hooks/useHashRoute'
-import { useInvoices } from './hooks/useInvoices'
-import { useMeta } from './hooks/useMeta'
-import { useToast } from './hooks/useToast'
-import type { Invoice } from './types/invoice'
-import { deriveCustomers } from './utils/customers'
+import { useMemo, type ReactNode } from 'react';
+import { AppShell, type Breadcrumb } from './components/AppShell/AppShell';
+import { Toast } from './components/Toast/Toast';
+import { InvoiceDetailPage } from './components/InvoiceDetailPage/InvoiceDetailPage';
+import { InvoiceFormPage } from './components/InvoiceFormPage/InvoiceFormPage';
+import { InvoiceListPage } from './components/InvoiceListPage/InvoiceListPage';
+import { paths, useHashRoute } from './hooks/useHashRoute';
+import { useInvoices } from './hooks/useInvoices';
+import { useMeta } from './hooks/useMeta';
+import { useToast } from './hooks/useToast';
+import type { Invoice } from './types/invoice';
+import { deriveCustomers } from './utils/customers';
 
 export const App = () => {
-  const { route, navigate } = useHashRoute()
-  const meta = useMeta()
-  const { invoices, status, error, reload, upsertInvoice, removeInvoice } = useInvoices()
-  const customers = useMemo(() => deriveCustomers(invoices), [invoices])
-  const toast = useToast()
+  const { route, navigate } = useHashRoute();
+  const meta = useMeta();
+  const { invoices, status, error, reload, upsertInvoice, removeInvoice } = useInvoices();
+  const customers = useMemo(() => deriveCustomers(invoices), [invoices]);
+  const toast = useToast();
 
   const handleSaved = (invoice: Invoice) => {
-    upsertInvoice(invoice)
-    toast.notify(`${invoice.invoiceNumber} saved`)
-    navigate(paths.detail(invoice.id))
-  }
+    upsertInvoice(invoice);
+    toast.notify(`${invoice.invoiceNumber} saved`);
+    navigate(paths.detail(invoice.id));
+  };
 
   const handleDeleted = (invoice: Invoice) => {
-    removeInvoice(invoice.id)
-    if (route.name !== 'list') navigate(paths.list())
-  }
+    removeInvoice(invoice.id);
+    if (route.name !== 'list') navigate(paths.list());
+  };
 
-  const numberFor = (id: string) => invoices.find((item) => item.id === id)?.invoiceNumber ?? id.toUpperCase()
-  const breadcrumbs = ['Accounts receivable', 'Invoices']
-  let page: ReactNode
+  const numberFor = (id: string) => invoices.find((item) => item.id === id)?.invoiceNumber ?? id.toUpperCase();
+  // accounts receivable has no page of its own yet, so only invoices links back
+  const breadcrumbs: Breadcrumb[] = [{ label: 'Accounts receivable' }, { label: 'Invoices', href: `#${paths.list()}` }];
+  let page: ReactNode;
 
   switch (route.name) {
     case 'new':
-      breadcrumbs.push('New invoice')
+      breadcrumbs.push({ label: 'New invoice' });
       page = (
         <InvoiceFormPage
           invoiceId={null}
@@ -45,10 +46,10 @@ export const App = () => {
           onSaved={handleSaved}
           onCancel={() => navigate(paths.list())}
         />
-      )
-      break
+      );
+      break;
     case 'edit':
-      breadcrumbs.push(`Edit ${numberFor(route.id)}`)
+      breadcrumbs.push({ label: numberFor(route.id), href: `#${paths.detail(route.id)}` }, { label: 'Edit' });
       page = (
         <InvoiceFormPage
           invoiceId={route.id}
@@ -57,10 +58,10 @@ export const App = () => {
           onSaved={handleSaved}
           onCancel={() => navigate(paths.detail(route.id))}
         />
-      )
-      break
+      );
+      break;
     case 'detail':
-      breadcrumbs.push(numberFor(route.id))
+      breadcrumbs.push({ label: numberFor(route.id) });
       page = (
         <InvoiceDetailPage
           id={route.id}
@@ -71,8 +72,8 @@ export const App = () => {
           onDeleted={handleDeleted}
           onNotify={toast.notify}
         />
-      )
-      break
+      );
+      break;
     default:
       page = (
         <InvoiceListPage
@@ -89,7 +90,7 @@ export const App = () => {
           onDeleted={handleDeleted}
           onNotify={toast.notify}
         />
-      )
+      );
   }
 
   return (
@@ -97,5 +98,5 @@ export const App = () => {
       {page}
       <Toast message={toast.message} onDismiss={toast.dismiss} />
     </AppShell>
-  )
-}
+  );
+};

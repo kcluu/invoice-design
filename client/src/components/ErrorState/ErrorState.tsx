@@ -1,12 +1,12 @@
-import { Button } from '../Button/Button'
-import { Actions, Message, Panel, Title } from './ErrorState.styled'
+import { Button } from '../Button/Button';
+import { Actions, Message, Panel, Title } from './ErrorState.styled';
 
 interface ErrorStateProp {
-  title: string
-  message: string
-  onRetry?: () => void
-  backHref?: string
-  backLabel?: string
+  title: string;
+  message: string;
+  onRetry?: () => void;
+  backHref?: string;
+  backLabel?: string;
 }
 
 // full-panel error for when a page's data couldn't load at all
@@ -19,4 +19,4 @@ export const ErrorState = ({ title, message, onRetry, backHref, backLabel = 'Bac
       {backHref && <a href={backHref}>{backLabel}</a>}
     </Actions>
   </Panel>
-)
+);

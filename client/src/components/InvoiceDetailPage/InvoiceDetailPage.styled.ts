@@ -1,19 +1,19 @@
-import styled from 'styled-components'
-import type { DueTone } from '../../utils/invoiceStatus'
+import styled from 'styled-components';
+import type { DueTone } from '../../utils/invoiceStatus';
 
-export type BannerTone = 'late' | 'soon' | 'neutral'
+export type BannerTone = 'late' | 'soon' | 'neutral';
 
 const bannerColors = {
   late: { bg: '#FDF0EA', fg: '#7C2D12', border: '#F4D0BF' },
   soon: { bg: '#FFF7E6', fg: '#6B4200', border: '#F1DDB0' },
   neutral: { bg: '#F4F4F1', fg: '#3D3D3B', border: '#E3E3DE' },
-}
+};
 
 export const Page = styled.section`
   display: flex;
   flex-direction: column;
   gap: 18px;
-`
+`;
 
 export const BackLink = styled.button`
   all: unset;
@@ -29,7 +29,7 @@ export const BackLink = styled.button`
   &:hover {
     color: ${({ theme }) => theme.color.text};
   }
-`
+`;
 
 export const Header = styled.div`
   display: flex;
@@ -37,14 +37,14 @@ export const Header = styled.div`
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-`
+`;
 
 export const TitleRow = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-`
+`;
 
 export const Title = styled.h1`
   font-size: ${({ theme }) => theme.font.size.xxl};
@@ -54,18 +54,18 @@ export const Title = styled.h1`
   &:focus {
     outline: none;
   }
-`
+`;
 
 export const Meta = styled.p`
   margin-top: 6px;
   color: ${({ theme }) => theme.color.textSecondary};
-`
+`;
 
 export const Actions = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-`
+`;
 
 export const Banner = styled.div<{ $tone: BannerTone }>`
   display: flex;
@@ -77,7 +77,7 @@ export const Banner = styled.div<{ $tone: BannerTone }>`
   background: ${({ $tone }) => bannerColors[$tone].bg};
   color: ${({ $tone }) => bannerColors[$tone].fg};
   border: 1px solid ${({ $tone }) => bannerColors[$tone].border};
-`
+`;
 
 export const ErrorBanner = styled.div`
   display: flex;
@@ -89,14 +89,14 @@ export const ErrorBanner = styled.div`
   background: ${({ theme }) => theme.color.dangerSoft};
   border: 1px solid ${({ theme }) => theme.color.dangerBorder};
   color: #8a2418;
-`
+`;
 
 export const Columns = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 20px;
-`
+`;
 
 export const MainColumn = styled.div`
   flex: 999 1 520px;
@@ -104,7 +104,7 @@ export const MainColumn = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
-`
+`;
 
 export const SideColumn = styled.div`
   flex: 1 1 300px;
@@ -112,19 +112,19 @@ export const SideColumn = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
-`
+`;
 
 export const Card = styled.section`
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: ${({ theme }) => theme.radius.lg};
-`
+`;
 
 export const CardTitle = styled.h2`
   padding: 14px 18px;
   font-size: ${({ theme }) => theme.font.size.md};
   font-weight: 600;
   border-bottom: 1px solid ${({ theme }) => theme.color.divider};
-`
+`;
 
 export const DetailGrid = styled.dl`
   margin: 0;
@@ -141,20 +141,20 @@ export const DetailGrid = styled.dl`
   dd {
     margin: 2px 0 0;
   }
-`
+`;
 
 export const Wide = styled.div`
   grid-column: 1 / -1;
-`
+`;
 
 export const DueHint = styled.span<{ $tone: DueTone }>`
   font-weight: 600;
   color: ${({ theme, $tone }) => theme.tone[$tone]};
-`
+`;
 
 export const TableScroll = styled.div`
   overflow-x: auto;
-`
+`;
 
 export const LineTable = styled.table`
   width: 100%;
@@ -188,7 +188,7 @@ export const LineTable = styled.table`
   .num {
     text-align: right;
   }
-`
+`;
 
 export const Totals = styled.dl`
   margin: 0 0 0 auto;
@@ -217,12 +217,12 @@ export const Totals = styled.dl`
     font-size: ${({ theme }) => theme.font.size.lg};
     color: ${({ theme }) => theme.color.text};
   }
-`
+`;
 
 export const TotalsRow = styled.div`
   display: flex;
   border-top: 1px solid ${({ theme }) => theme.color.divider};
-`
+`;
 
 export const Balance = styled.div`
   padding: 16px 18px;
@@ -240,7 +240,7 @@ export const Balance = styled.div`
     font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
-`
+`;
 
 export const Activity = styled.ol`
   list-style: none;
@@ -270,4 +270,4 @@ export const Activity = styled.ol`
     font-size: ${({ theme }) => theme.font.size.sm};
     color: ${({ theme }) => theme.color.textMuted};
   }
-`
+`;

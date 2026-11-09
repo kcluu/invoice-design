@@ -1,26 +1,26 @@
-import { screen, waitFor, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { buildInvoice } from '../../test/factories'
-import { jsonResponse, mockFetch } from '../../test/fetchMock'
-import { renderWithTheme } from '../../test/render'
-import { InvoiceListPage } from './InvoiceListPage'
+import { screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { buildInvoice } from '../../test/factories';
+import { jsonResponse, mockFetch } from '../../test/fetchMock';
+import { renderWithTheme } from '../../test/render';
+import { InvoiceListPage } from './InvoiceListPage';
 
-const AS_OF = '2026-05-04'
+const AS_OF = '2026-05-04';
 
-const acme = buildInvoice({ invoiceNumber: 'INV-2026-0412', customerName: 'Acme Labs', dueDate: '2026-05-28' })
+const acme = buildInvoice({ invoiceNumber: 'INV-2026-0412', customerName: 'Acme Labs', dueDate: '2026-05-28' });
 const brightline = buildInvoice({
   invoiceNumber: 'INV-2026-0413',
   customerName: 'Brightline Health',
   status: 'Draft',
   paymentStatus: 'Unsent',
-})
+});
 const juniper = buildInvoice({
   invoiceNumber: 'INV-2026-0408',
   customerName: 'Juniper Supply Co.',
   dueDate: '2026-04-10',
   paymentStatus: 'Overdue',
-})
+});
 
 const renderPage = (overrides: Partial<Parameters<typeof InvoiceListPage>[0]> = {}) => {
   const props = {
@@ -37,60 +37,60 @@ const renderPage = (overrides: Partial<Parameters<typeof InvoiceListPage>[0]> = 
     onDeleted: vi.fn(),
     onNotify: vi.fn(),
     ...overrides,
-  }
-  renderWithTheme(<InvoiceListPage {...props} />)
-  return props
-}
+  };
+  renderWithTheme(<InvoiceListPage {...props} />);
+  return props;
+};
 
-const bodyRows = () => within(screen.getByRole('table')).getAllByRole('row').slice(1)
+const bodyRows = () => within(screen.getByRole('table')).getAllByRole('row').slice(1);
 
 describe('InvoiceListPage', () => {
   beforeEach(() => {
-    mockFetch()
-  })
+    mockFetch();
+  });
 
   it('shows a row per invoice with its due label', () => {
-    renderPage()
-    expect(bodyRows()).toHaveLength(3)
-    expect(screen.getByText('24 days overdue')).toBeInTheDocument()
-  })
+    renderPage();
+    expect(bodyRows()).toHaveLength(3);
+    expect(screen.getByText('24 days overdue')).toBeInTheDocument();
+  });
 
   it('narrows the table when a summary card is clicked', async () => {
-    const user = userEvent.setup()
-    renderPage()
-    await user.click(screen.getByText('Drafts to send'))
-    expect(bodyRows()).toHaveLength(1)
-    expect(within(bodyRows()[0]).getByText('Brightline Health')).toBeInTheDocument()
-  })
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByText('Drafts to send'));
+    expect(bodyRows()).toHaveLength(1);
+    expect(within(bodyRows()[0]).getByText('Brightline Health')).toBeInTheDocument();
+  });
 
   it('offers a retry when invoices fail to load', async () => {
-    const user = userEvent.setup()
-    const props = renderPage({ status: 'error', error: 'Can’t reach the server. Check your connection and try again.' })
-    expect(screen.getByText('Couldn’t load invoices')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Try again' }))
-    expect(props.onRetry).toHaveBeenCalled()
-  })
+    const user = userEvent.setup();
+    const props = renderPage({ status: 'error', error: "Can't reach the server. Check your connection and try again." });
+    expect(screen.getByText("Couldn't load invoices")).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(props.onRetry).toHaveBeenCalled();
+  });
 
   it('opens an invoice from its number', async () => {
-    const user = userEvent.setup()
-    const props = renderPage()
-    await user.click(screen.getByRole('button', { name: 'INV-2026-0412' }))
-    expect(props.onOpen).toHaveBeenCalledWith(acme.id)
-  })
+    const user = userEvent.setup();
+    const props = renderPage();
+    await user.click(screen.getByRole('button', { name: 'INV-2026-0412' }));
+    expect(props.onOpen).toHaveBeenCalledWith(acme.id);
+  });
 
   it('deletes a draft after confirming', async () => {
-    const fetchMock = mockFetch()
-    fetchMock.mockResolvedValueOnce(jsonResponse(null, 204))
-    const user = userEvent.setup()
-    const props = renderPage()
+    const fetchMock = mockFetch();
+    fetchMock.mockResolvedValueOnce(jsonResponse(null, 204));
+    const user = userEvent.setup();
+    const props = renderPage();
 
-    const row = bodyRows().find((item) => within(item).queryByText('Brightline Health'))!
-    await user.click(within(row).getByRole('button', { name: /more actions for INV-2026-0413/i }))
-    await user.click(within(row).getByRole('menuitem', { name: 'Delete' }))
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Delete invoice' }))
+    const row = bodyRows().find((item) => within(item).queryByText('Brightline Health'))!;
+    await user.click(within(row).getByRole('button', { name: /more actions for INV-2026-0413/i }));
+    await user.click(within(row).getByRole('menuitem', { name: 'Delete' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Delete invoice' }));
 
-    await waitFor(() => expect(props.onDeleted).toHaveBeenCalledWith(brightline))
-    expect(props.onNotify).toHaveBeenCalledWith('INV-2026-0413 deleted')
-    expect(fetchMock).toHaveBeenCalledWith(`/api/invoices/${brightline.id}`, expect.objectContaining({ method: 'DELETE' }))
-  })
-})
+    await waitFor(() => expect(props.onDeleted).toHaveBeenCalledWith(brightline));
+    expect(props.onNotify).toHaveBeenCalledWith('INV-2026-0413 deleted');
+    expect(fetchMock).toHaveBeenCalledWith(`/api/invoices/${brightline.id}`, expect.objectContaining({ method: 'DELETE' }));
+  });
+});

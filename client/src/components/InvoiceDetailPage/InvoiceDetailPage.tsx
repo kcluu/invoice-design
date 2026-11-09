@@ -1,19 +1,21 @@
-import { useState } from 'react'
-import { useFocusOnReady } from '../../hooks/useFocusOnReady'
-import { paths } from '../../hooks/useHashRoute'
-import { useInvoice } from '../../hooks/useInvoice'
-import { useInvoiceActions } from '../../hooks/useInvoiceActions'
-import { REVENUE_ACCOUNTS, type Invoice } from '../../types/invoice'
-import { formatDate, formatTimestamp } from '../../utils/dates'
-import { displayStatus, dueInfo, isOutstanding, type DueInfo } from '../../utils/invoiceStatus'
-import { availableActions } from '../../utils/invoicePermissions'
-import { computeTotals, lineAmount } from '../../utils/invoiceTotals'
-import { formatMoney, formatPercent, formatQuantity, formatUnitPrice } from '../../utils/money'
-import { Button } from '../Button/Button'
-import { ConfirmDeleteDialog } from '../ConfirmDeleteDialog/ConfirmDeleteDialog'
-import { ErrorState } from '../ErrorState/ErrorState'
-import { InvoiceDetailSkeleton } from '../InvoiceDetailSkeleton/InvoiceDetailSkeleton'
-import { StatusBadge } from '../StatusBadge/StatusBadge'
+import { useState } from 'react';
+import { useFocusOnReady } from '../../hooks/useFocusOnReady';
+import { paths } from '../../hooks/useHashRoute';
+import { useInvoice } from '../../hooks/useInvoice';
+import { useInvoiceActions } from '../../hooks/useInvoiceActions';
+import { REVENUE_ACCOUNTS, type Invoice } from '../../types/invoice';
+import { formatDate, formatTimestamp } from '../../utils/dates';
+import { displayStatus, dueInfo, isOutstanding, type DueInfo } from '../../utils/invoiceStatus';
+import { availableActions } from '../../utils/invoicePermissions';
+import { computeTotals, lineAmount } from '../../utils/invoiceTotals';
+import { formatMoney, formatPercent, formatQuantity, formatUnitPrice } from '../../utils/money';
+import { Button } from '../Button/Button';
+import { ConfirmDeleteDialog } from '../ConfirmDeleteDialog/ConfirmDeleteDialog';
+import { ErrorState } from '../ErrorState/ErrorState';
+import { Icon } from '../Icon/Icon';
+import { InvoiceDetailSkeleton } from '../InvoiceDetailSkeleton/InvoiceDetailSkeleton';
+import { StatusBadge } from '../StatusBadge/StatusBadge';
+import { InvoiceComments } from './InvoiceComments/InvoiceComments';
 import {
   Actions,
   Activity,
@@ -39,67 +41,67 @@ import {
   Totals,
   TotalsRow,
   Wide,
-} from './InvoiceDetailPage.styled'
+} from './InvoiceDetailPage.styled';
 
 interface InvoiceDetailPageProp {
-  id: string
-  asOfDate: string
-  onBack: () => void
-  onEdit: (id: string) => void
-  onUpdated: (invoice: Invoice) => void
-  onDeleted: (invoice: Invoice) => void
-  onNotify: (message: string) => void
+  id: string;
+  asOfDate: string;
+  onBack: () => void;
+  onEdit: (id: string) => void;
+  onUpdated: (invoice: Invoice) => void;
+  onDeleted: (invoice: Invoice) => void;
+  onNotify: (message: string) => void;
 }
 
 const accountLabel = (code: string) => {
-  const account = REVENUE_ACCOUNTS.find((item) => item.code === code)
-  return account ? `${code} · ${account.name}` : code
-}
+  const account = REVENUE_ACCOUNTS.find((item) => item.code === code);
+  return account ? `${code} · ${account.name}` : code;
+};
 
 // one line of context at the top so the state of the invoice is obvious
 const bannerFor = (invoice: Invoice, due: DueInfo): { tone: BannerTone; text: string } | null => {
-  const status = displayStatus(invoice)
+  const status = displayStatus(invoice);
   if (status === 'Overdue')
-    return { tone: 'late', text: `This invoice is ${due.label}. Follow up with ${invoice.customerName} or record a payment.` }
-  if (status === 'Open' && due.isDueSoon) return { tone: 'soon', text: `${due.label}. The balance is still open.` }
-  if (status === 'Draft') return { tone: 'neutral', text: 'Draft. Not sent to the customer yet, so it isn’t in AR aging.' }
-  if (status === 'Void') return { tone: 'neutral', text: 'Voided. Kept for the audit trail and excluded from AR.' }
-  return null
-}
+    return { tone: 'late', text: `This invoice is ${due.label}. Follow up with ${invoice.customerName} or record a payment.` };
+  if (status === 'Open' && due.isDueSoon) return { tone: 'soon', text: `${due.label}. The balance is still open.` };
+  if (status === 'Draft') return { tone: 'neutral', text: "Draft. Not sent to the customer yet, so it isn't in AR aging." };
+  if (status === 'Void') return { tone: 'neutral', text: 'Voided. Kept for the audit trail and excluded from AR.' };
+  return null;
+};
 
 export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onDeleted, onNotify }: InvoiceDetailPageProp) => {
-  const { invoice, status, error, setInvoice, reload } = useInvoice(id)
-  const [confirmingDelete, setConfirmingDelete] = useState(false)
-  const headingRef = useFocusOnReady<HTMLHeadingElement>(status === 'success')
+  const { invoice, status, error, setInvoice, reload } = useInvoice(id);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const headingRef = useFocusOnReady<HTMLHeadingElement>(status === 'success');
   const actions = useInvoiceActions({
     onUpdated: (updated) => {
-      setInvoice(updated)
-      onUpdated(updated)
+      setInvoice(updated);
+      onUpdated(updated);
     },
     onDeleted,
     onNotify,
-  })
+  });
 
-  if (status === 'loading') return <InvoiceDetailSkeleton />
+  if (status === 'loading') return <InvoiceDetailSkeleton />;
   if (status === 'error' || !invoice) {
     return (
       <ErrorState
-        title="Couldn’t open this invoice"
+        title="Couldn't open this invoice"
         message={error ?? 'Something went wrong.'}
         onRetry={() => void reload()}
         backHref={`#${paths.list()}`}
       />
-    )
+    );
   }
 
-  const totals = computeTotals(invoice)
-  const due = dueInfo(invoice, asOfDate)
-  const money = (amount: number) => formatMoney(amount, invoice.currency)
-  const allowed = availableActions(invoice)
-  const busy = actions.pending !== null
-  const pendingAction = actions.pending?.action
-  const banner = bannerFor(invoice, due)
-  const balance = isOutstanding(invoice) || invoice.status === 'Draft' ? totals.total : 0
+  const totals = computeTotals(invoice);
+  const due = dueInfo(invoice, asOfDate);
+  const money = (amount: number) => formatMoney(amount, invoice.currency);
+  const allowed = availableActions(invoice);
+  const busy = actions.pending !== null;
+  const pendingAction = actions.pending?.action;
+  const banner = bannerFor(invoice, due);
+  const balance = isOutstanding(invoice) || invoice.status === 'Draft' ? totals.total : 0;
 
   return (
     <Page>
@@ -123,7 +125,17 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onD
           </Meta>
         </div>
         <Actions>
-          {allowed.canEdit && <Button onClick={() => onEdit(invoice.id)}>Edit</Button>}
+          {/* no pdf generation yet, so this only confirms what a real download would do */}
+          <Button onClick={() => onNotify(`${invoice.invoiceNumber}.pdf downloaded (prototype)`)}>
+            <Icon name="download" size={14} />
+            Download
+          </Button>
+          {allowed.canEdit && (
+            <Button onClick={() => onEdit(invoice.id)}>
+              <Icon name="pencil" size={14} />
+              Edit
+            </Button>
+          )}
           {allowed.canVoid && (
             <Button disabled={busy} onClick={() => void actions.run(invoice, 'void')}>
               {pendingAction === 'void' ? 'Voiding…' : 'Void'}
@@ -264,6 +276,11 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onD
               ))}
             </Activity>
           </Card>
+
+          <Card>
+            <CardTitle>Comments</CardTitle>
+            <InvoiceComments key={invoice.id} />
+          </Card>
         </SideColumn>
       </Columns>
 
@@ -273,11 +290,8 @@ export const InvoiceDetailPage = ({ id, asOfDate, onBack, onEdit, onUpdated, onD
           busy={busy}
           onCancel={() => setConfirmingDelete(false)}
           onConfirm={() => void actions.run(invoice, 'delete')}
-          onVoidInstead={async () => {
-            if (await actions.run(invoice, 'void')) setConfirmingDelete(false)
-          }}
         />
       )}
     </Page>
-  )
-}
+  );
+};

@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components'
+import styled, { css } from 'styled-components';
 
 // shared look for every text input and select in the form
 export const controlStyles = css`
@@ -27,13 +27,13 @@ export const controlStyles = css`
     box-shadow: 0 0 0 1px ${({ theme }) => theme.color.danger};
     background: #fffbfa;
   }
-`
+`;
 
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
   gap: 18px;
-`
+`;
 
 export const Header = styled.div`
   display: flex;
@@ -41,7 +41,7 @@ export const Header = styled.div`
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-`
+`;
 
 export const Title = styled.h1`
   font-size: ${({ theme }) => theme.font.size.xxl};
@@ -51,12 +51,12 @@ export const Title = styled.h1`
   &:focus {
     outline: none;
   }
-`
+`;
 
 export const Subtitle = styled.p`
   margin-top: 4px;
   color: ${({ theme }) => theme.color.textMuted};
-`
+`;
 
 export const Note = styled.p`
   padding: 12px 14px;
@@ -64,7 +64,7 @@ export const Note = styled.p`
   background: #f3f5f8;
   border: 1px solid #dce3ec;
   color: #2c3e57;
-`
+`;
 
 export const ErrorBanner = styled.p`
   padding: 12px 14px;
@@ -72,7 +72,7 @@ export const ErrorBanner = styled.p`
   background: ${({ theme }) => theme.color.dangerSoft};
   border: 1px solid ${({ theme }) => theme.color.dangerBorder};
   color: #8a2418;
-`
+`;
 
 export const Card = styled.fieldset`
   margin: 0;
@@ -80,7 +80,7 @@ export const Card = styled.fieldset`
   min-width: 0;
   border: 1px solid ${({ theme }) => theme.color.border};
   border-radius: ${({ theme }) => theme.radius.lg};
-`
+`;
 
 export const CardTitle = styled.legend`
   float: left;
@@ -92,7 +92,7 @@ export const CardTitle = styled.legend`
   & + * {
     clear: both;
   }
-`
+`;
 
 export const FieldGrid = styled.div`
   clear: both;
@@ -100,7 +100,7 @@ export const FieldGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px 20px;
-`
+`;
 
 export const Field = styled.label<{ $wide?: boolean }>`
   display: flex;
@@ -117,16 +117,16 @@ export const Field = styled.label<{ $wide?: boolean }>`
     font-size: ${({ theme }) => theme.font.size.md};
     font-weight: 400;
   }
-`
+`;
 
 export const Required = styled.span`
   color: ${({ theme }) => theme.color.danger};
-`
+`;
 
 export const Hint = styled.span`
   font-weight: 400;
   color: ${({ theme }) => theme.color.textMuted};
-`
+`;
 
 export const Totals = styled.dl`
   margin: 0 0 0 auto;
@@ -155,12 +155,12 @@ export const Totals = styled.dl`
     font-size: ${({ theme }) => theme.font.size.lg};
     color: ${({ theme }) => theme.color.text};
   }
-`
+`;
 
 export const TotalsRow = styled.div`
   display: flex;
   border-top: 1px solid ${({ theme }) => theme.color.divider};
-`
+`;
 
 export const Footer = styled.div`
   position: sticky;
@@ -172,4 +172,4 @@ export const Footer = styled.div`
   padding: 12px 0;
   background: #fff;
   border-top: 1px solid ${({ theme }) => theme.color.border};
-`
+`;

@@ -1,8 +1,8 @@
-import { Bubble, Dismiss, Region } from './Toast.styled'
+import { Bubble, Dismiss, Region } from './Toast.styled';
 
 interface ToastProp {
-  message: string | null
-  onDismiss: () => void
+  message: string | null;
+  onDismiss: () => void;
 }
 
 // the live region stays mounted so screen readers notice when a message appears
@@ -19,4 +19,4 @@ export const Toast = ({ message, onDismiss }: ToastProp) => (
       </Bubble>
     )}
   </Region>
-)
+);

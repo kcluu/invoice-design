@@ -1,20 +1,20 @@
-import styled from 'styled-components'
-import { controlStyles } from '../InvoiceForm/InvoiceForm.styled'
+import styled from 'styled-components';
+import { controlStyles } from '../InvoiceForm/InvoiceForm.styled';
 
 export const Wrap = styled.div`
   clear: both;
-`
+`;
 
 export const TableScroll = styled.div`
   overflow-x: auto;
-`
+`;
 
 export const Table = styled.table`
   width: 100%;
   min-width: 720px;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
-`
+`;
 
 export const Th = styled.th<{ $width?: string; $align?: 'left' | 'right' }>`
   width: ${({ $width = 'auto' }) => $width};
@@ -27,7 +27,7 @@ export const Th = styled.th<{ $width?: string; $align?: 'left' | 'right' }>`
   &:first-child {
     padding-left: 18px;
   }
-`
+`;
 
 export const Td = styled.td<{ $align?: 'left' | 'right' }>`
   padding: 8px;
@@ -43,8 +43,7 @@ export const Td = styled.td<{ $align?: 'left' | 'right' }>`
     padding-right: 18px;
   }
 
-  input,
-  select {
+  input {
     ${controlStyles}
     min-height: 34px;
     padding: 0 8px;
@@ -53,13 +52,13 @@ export const Td = styled.td<{ $align?: 'left' | 'right' }>`
   input[type='number'] {
     text-align: right;
   }
-`
+`;
 
 export const Amount = styled.span`
   display: inline-block;
   padding-top: 8px;
   font-weight: 500;
-`
+`;
 
 export const RemoveButton = styled.button`
   width: 32px;
@@ -76,8 +75,8 @@ export const RemoveButton = styled.button`
     background: ${({ theme }) => theme.color.surfaceMuted};
     color: ${({ theme }) => theme.color.danger};
   }
-`
+`;
 
 export const AddRow = styled.div`
   padding: 10px 18px 14px;
-`
+`;

@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components'
+import { createGlobalStyle } from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
   *, *::before, *::after {
@@ -38,4 +38,4 @@ export const GlobalStyle = createGlobalStyle`
       transition-duration: 0.01ms !important;
     }
   }
-`
+`;

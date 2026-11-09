@@ -1,9 +1,9 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { ThemeProvider } from 'styled-components'
-import { App } from './App'
-import { GlobalStyle } from './theme/GlobalStyle.styled'
-import { theme } from './theme/theme'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { ThemeProvider } from 'styled-components';
+import { App } from './App';
+import { GlobalStyle } from './theme/GlobalStyle.styled';
+import { theme } from './theme/theme';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -12,4 +12,4 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <App />
     </ThemeProvider>
   </React.StrictMode>
-)
+);

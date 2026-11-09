@@ -1,26 +1,33 @@
-import type { InvoiceAction } from '../../hooks/useInvoiceActions'
-import { useMenu } from '../../hooks/useMenu'
-import type { Invoice } from '../../types/invoice'
-import { availableActions } from '../../utils/invoicePermissions'
-import { Divider, Menu, MenuItem, MenuNote, MenuWrap, Trigger } from './RowActionsMenu.styled'
+import type { InvoiceAction } from '../../hooks/useInvoiceActions';
+import { useMenu } from '../../hooks/useMenu';
+import type { Invoice } from '../../types/invoice';
+import { availableActions } from '../../utils/invoicePermissions';
+import { Divider, Menu, MenuItem, MenuNote, MenuWrap, Trigger } from './RowActionsMenu.styled';
+
+// why delete is missing, so the menu points to the right action instead
+const deleteBlockedNote: Record<Exclude<Invoice['status'], 'Draft'>, string> = {
+  Sent: "Sent invoices can't be deleted. Void it instead.",
+  Void: 'Voided invoices stay on record.',
+  Paid: "Paid invoices can't be deleted.",
+};
 
 interface RowActionsMenuProp {
-  invoice: Invoice
-  onView: () => void
-  onEdit: () => void
-  onAction: (action: Exclude<InvoiceAction, 'delete'>) => void
-  onRequestDelete: () => void
+  invoice: Invoice;
+  onView: () => void;
+  onEdit: () => void;
+  onAction: (action: Exclude<InvoiceAction, 'delete'>) => void;
+  onRequestDelete: () => void;
 }
 
 export const RowActionsMenu = ({ invoice, onView, onEdit, onAction, onRequestDelete }: RowActionsMenuProp) => {
-  const menu = useMenu()
-  const actions = availableActions(invoice)
+  const menu = useMenu();
+  const actions = availableActions(invoice);
 
   // return focus to the trigger first so a dialog opened next can hand it back there
   const pick = (fn: () => void) => () => {
-    menu.close()
-    fn()
-  }
+    menu.close();
+    fn();
+  };
 
   return (
     <MenuWrap>
@@ -43,6 +50,7 @@ export const RowActionsMenu = ({ invoice, onView, onEdit, onAction, onRequestDel
       {menu.open && (
         <Menu
           ref={menu.menuRef}
+          style={menu.menuStyle}
           id={menu.menuId}
           role="menu"
           aria-label={`Actions for ${invoice.invoiceNumber}`}
@@ -77,10 +85,10 @@ export const RowActionsMenu = ({ invoice, onView, onEdit, onAction, onRequestDel
               Delete
             </MenuItem>
           ) : (
-            <MenuNote role="none">Paid invoices can’t be deleted. Reverse the payment first.</MenuNote>
+            <MenuNote role="none">{invoice.status !== 'Draft' && deleteBlockedNote[invoice.status]}</MenuNote>
           )}
         </Menu>
       )}
     </MenuWrap>
-  )
-}
+  );
+};

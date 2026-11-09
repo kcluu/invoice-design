@@ -1,10 +1,10 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const TabList = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-`
+`;
 
 export const Tab = styled.button<{ $active: boolean }>`
   all: unset;
@@ -22,7 +22,7 @@ export const Tab = styled.button<{ $active: boolean }>`
   &:hover {
     color: ${({ theme }) => theme.color.text};
   }
-`
+`;
 
 export const Count = styled.span<{ $active: boolean }>`
   font-size: ${({ theme }) => theme.font.size.xs};
@@ -30,4 +30,4 @@ export const Count = styled.span<{ $active: boolean }>`
   border-radius: ${({ theme }) => theme.radius.pill};
   background: ${({ $active }) => ($active ? '#E3E3DE' : '#F0F0EC')};
   color: #4a4a47;
-`
+`;

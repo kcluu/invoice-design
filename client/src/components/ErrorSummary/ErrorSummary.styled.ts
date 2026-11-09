@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const Box = styled.div`
   display: flex;
@@ -18,24 +18,13 @@ export const Box = styled.div`
     flex: none;
     margin-top: 2px;
   }
-`
-
-export const SummaryLink = styled.button`
-  all: unset;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-
-  &:hover {
-    text-decoration-thickness: 2px;
-  }
-`
+`;
 
 export const Content = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
-`
+`;
 
 export const List = styled.ul`
   margin: 0;
@@ -44,4 +33,4 @@ export const List = styled.ul`
   display: flex;
   flex-direction: column;
   gap: 3px;
-`
+`;

@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const Backdrop = styled.div`
   position: fixed;
@@ -9,7 +9,7 @@ export const Backdrop = styled.div`
   justify-content: center;
   padding: 16px;
   background: ${({ theme }) => theme.color.overlay};
-`
+`;
 
 export const Panel = styled.div`
   width: 100%;
@@ -21,16 +21,16 @@ export const Panel = styled.div`
   background: #fff;
   border-radius: ${({ theme }) => theme.radius.xl};
   box-shadow: ${({ theme }) => theme.shadow.dialog};
-`
+`;
 
 export const Title = styled.h2`
   font-size: 17px;
   font-weight: 600;
-`
+`;
 
 export const Body = styled.p`
   color: #3d3d3b;
-`
+`;
 
 export const Summary = styled.div`
   display: flex;
@@ -43,12 +43,12 @@ export const Summary = styled.div`
   strong {
     font-variant-numeric: tabular-nums;
   }
-`
+`;
 
 export const FinePrint = styled.p`
   font-size: ${({ theme }) => theme.font.size.sm};
   color: ${({ theme }) => theme.color.textMuted};
-`
+`;
 
 export const Footer = styled.div`
   display: flex;
@@ -56,4 +56,4 @@ export const Footer = styled.div`
   justify-content: flex-end;
   gap: 8px;
   margin-top: 4px;
-`
+`;

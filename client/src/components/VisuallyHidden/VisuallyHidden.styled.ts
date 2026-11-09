@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components'
+import styled, { css } from 'styled-components';
 
 // hides content visually but keeps it in the accessibility tree
 export const visuallyHidden = css`
@@ -11,8 +11,8 @@ export const visuallyHidden = css`
   clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
-`
+`;
 
 export const Hidden = styled.span`
   ${visuallyHidden}
-`
+`;

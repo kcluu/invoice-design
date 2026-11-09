@@ -1,13 +1,13 @@
-import { Skeleton } from '../Skeleton/Skeleton'
-import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden'
-import { Cell, Table, Wrap } from './InvoiceTableSkeleton.styled'
+import { Skeleton } from '../Skeleton/Skeleton';
+import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden';
+import { Cell, Table, Wrap } from './InvoiceTableSkeleton.styled';
 
 interface InvoiceTableSkeletonProp {
-  rows?: number
+  rows?: number;
 }
 
 // vary the bar widths a little so it reads like real content
-const widths = ['62%', '48%', '70%', '55%', '66%']
+const widths = ['62%', '48%', '70%', '55%', '66%'];
 
 export const InvoiceTableSkeleton = ({ rows = 5 }: InvoiceTableSkeletonProp) => (
   <Wrap role="status">
@@ -46,4 +46,4 @@ export const InvoiceTableSkeleton = ({ rows = 5 }: InvoiceTableSkeletonProp) => 
       </tbody>
     </Table>
   </Wrap>
-)
+);

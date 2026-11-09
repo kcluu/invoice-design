@@ -1,6 +1,6 @@
-import { Skeleton } from '../Skeleton/Skeleton'
-import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden'
-import { Buttons, Card, Columns, FieldGrid, Group, HeaderRow, Stack } from './InvoiceDetailSkeleton.styled'
+import { Skeleton } from '../Skeleton/Skeleton';
+import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden';
+import { Buttons, Card, Columns, FieldGrid, Group, HeaderRow, Stack } from './InvoiceDetailSkeleton.styled';
 
 export const InvoiceDetailSkeleton = () => (
   <Stack role="status">
@@ -40,4 +40,4 @@ export const InvoiceDetailSkeleton = () => (
       </Card>
     </Columns>
   </Stack>
-)
+);

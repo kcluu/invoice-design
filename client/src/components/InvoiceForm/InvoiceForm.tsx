@@ -1,18 +1,21 @@
-import { useState } from 'react'
-import { useFocusOnReady } from '../../hooks/useFocusOnReady'
-import { formFromInput, useInvoiceForm, type InvoiceFormValues } from '../../hooks/useInvoiceForm'
-import { useSaveInvoice } from '../../hooks/useSaveInvoice'
-import { CURRENCIES, PAYMENT_TERMS, type Invoice, type PaymentTerms } from '../../types/invoice'
-import type { CustomerProfile } from '../../utils/customers'
-import { fieldId } from '../../utils/fieldId'
-import { availableActions } from '../../utils/invoicePermissions'
-import { formatMoney } from '../../utils/money'
-import { Button } from '../Button/Button'
-import { DraftFromText } from '../DraftFromText/DraftFromText'
-import { ErrorSummary } from '../ErrorSummary/ErrorSummary'
-import { FieldError } from '../FieldError/FieldError'
-import { LineItemsEditor } from '../LineItemsEditor/LineItemsEditor'
-import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden'
+import { useState } from 'react';
+import { useFocusOnReady } from '../../hooks/useFocusOnReady';
+import { formFromInput, useInvoiceForm, type InvoiceFormValues } from '../../hooks/useInvoiceForm';
+import { useSaveInvoice } from '../../hooks/useSaveInvoice';
+import { CURRENCIES, PAYMENT_TERMS, type Invoice } from '../../types/invoice';
+import type { CustomerProfile } from '../../utils/customers';
+import { fieldId } from '../../utils/fieldId';
+import { availableActions } from '../../utils/invoicePermissions';
+import { formatMoney } from '../../utils/money';
+import { Button } from '../Button/Button';
+import { CustomerCombobox } from '../CustomerCombobox/CustomerCombobox';
+import { DraftFromText } from '../DraftFromText/DraftFromText';
+import { ErrorSummary } from '../ErrorSummary/ErrorSummary';
+import { FieldError } from '../FieldError/FieldError';
+import { Icon } from '../Icon/Icon';
+import { LineItemsEditor } from '../LineItemsEditor/LineItemsEditor';
+import { Select } from '../Select/Select';
+import { VisuallyHidden } from '../VisuallyHidden/VisuallyHidden';
 import {
   Card,
   CardTitle,
@@ -29,28 +32,31 @@ import {
   Title,
   Totals,
   TotalsRow,
-} from './InvoiceForm.styled'
+} from './InvoiceForm.styled';
+
+const CURRENCY_OPTIONS = CURRENCIES.map((currency) => ({ value: currency, label: currency }));
+const TERMS_OPTIONS = PAYMENT_TERMS.map((terms) => ({ value: terms, label: terms }));
 
 interface InvoiceFormProp {
-  invoice: Invoice | null
-  initialValues: InvoiceFormValues
-  customers: CustomerProfile[]
-  onSaved: (invoice: Invoice) => void
-  onCancel: () => void
-  showDraftPanel?: boolean
+  invoice: Invoice | null;
+  initialValues: InvoiceFormValues;
+  customers: CustomerProfile[];
+  onSaved: (invoice: Invoice) => void;
+  onCancel: () => void;
+  showDraftPanel?: boolean;
 }
 
 export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCancel, showDraftPanel = false }: InvoiceFormProp) => {
-  const form = useInvoiceForm({ initialValues, customers })
-  const { values, setField, errors } = form
-  const { save, saving, error } = useSaveInvoice()
-  const locked = invoice ? availableActions(invoice).isLocked : false
-  const headingRef = useFocusOnReady<HTMLHeadingElement>(true)
-  const money = (amount: number) => formatMoney(amount, values.currency)
+  const form = useInvoiceForm({ initialValues, customers });
+  const { values, setField, errors } = form;
+  const { save, saving, error } = useSaveInvoice();
+  const locked = invoice ? availableActions(invoice).isLocked : false;
+  const headingRef = useFocusOnReady<HTMLHeadingElement>(true);
+  const money = (amount: number) => formatMoney(amount, values.currency);
 
   // counts failed save attempts so the error summary can take focus each time
-  const [failedAttempts, setFailedAttempts] = useState(0)
-  const [draftOpen, setDraftOpen] = useState(showDraftPanel)
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [draftOpen, setDraftOpen] = useState(showDraftPanel);
 
   // ties an input to its id, required state, hint and inline error
   const fieldProps = (key: string, { required = false, hintId }: { required?: boolean; hintId?: string } = {}) => ({
@@ -58,31 +64,31 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
     'aria-required': required || undefined,
     'aria-invalid': errors[key] ? true : undefined,
     'aria-describedby': [errors[key] ? `${key}-error` : null, hintId].filter(Boolean).join(' ') || undefined,
-  })
+  });
 
   const submit = async (send: boolean) => {
-    if (saving) return
+    if (saving) return;
     if (!form.validate()) {
-      setFailedAttempts((count) => count + 1)
-      return
+      setFailedAttempts((count) => count + 1);
+      return;
     }
     const result = invoice
       ? await save({ mode: 'edit', invoice, input: form.input })
-      : await save({ mode: 'create', input: form.input, send })
+      : await save({ mode: 'create', input: form.input, send });
     if (result.ok) {
-      onSaved(result.invoice)
-      return
+      onSaved(result.invoice);
+      return;
     }
-    form.applyServerErrors(result.fieldErrors)
-    if (Object.keys(result.fieldErrors).length) setFailedAttempts((count) => count + 1)
-  }
+    form.applyServerErrors(result.fieldErrors);
+    if (Object.keys(result.fieldErrors).length) setFailedAttempts((count) => count + 1);
+  };
 
   return (
     <Form
       noValidate
       onSubmit={(event) => {
-        event.preventDefault()
-        void submit(false)
+        event.preventDefault();
+        void submit(false);
       }}
     >
       <Header>
@@ -95,7 +101,8 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
           </Subtitle>
         </div>
         {!invoice && !draftOpen && (
-          <Button variant="ghost" onClick={() => setDraftOpen(true)}>
+          <Button variant="secondary" onClick={() => setDraftOpen(true)}>
+            <Icon name="sparkle" size={15} />
             Draft from text instead
           </Button>
         )}
@@ -115,31 +122,23 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
         </Note>
       )}
       {error && <ErrorBanner role="alert">{error}</ErrorBanner>}
-      <ErrorSummary
-        items={form.errorSummary}
-        focusSignal={failedAttempts}
-        onSelect={(key) => document.getElementById(fieldId(key))?.focus()}
-      />
+      <ErrorSummary items={form.errorSummary} focusSignal={failedAttempts} />
 
       <Card>
         <CardTitle>Details</CardTitle>
         <FieldGrid>
-          <Field>
-            <span>
+          {/* a div with its own label, so the open list isn't read as part of the field's name */}
+          <Field as="div">
+            <label htmlFor={fieldId('customerName')}>
               Customer <Required aria-hidden="true">*</Required>
-            </span>
-            <input
-              list="customer-options"
+            </label>
+            <CustomerCombobox
+              customers={customers}
               value={values.customerName}
               disabled={locked}
-              onChange={(event) => setField('customerName', event.target.value)}
+              onChange={(value) => setField('customerName', value)}
               {...fieldProps('customerName', { required: true })}
             />
-            <datalist id="customer-options">
-              {customers.map((customer) => (
-                <option key={customer.name} value={customer.name} />
-              ))}
-            </datalist>
             <FieldError id="customerName-error" message={errors.customerName} />
           </Field>
           <Field>
@@ -164,18 +163,18 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
               onChange={(event) => setField('billingAddress', event.target.value)}
             />
           </Field>
-          <Field>
-            Currency
-            <select
+          <Field as="div">
+            <label id={`${fieldId('currency')}-label`} htmlFor={fieldId('currency')}>
+              Currency
+            </label>
+            <Select
               id={fieldId('currency')}
+              aria-labelledby={`${fieldId('currency')}-label`}
               value={values.currency}
+              options={CURRENCY_OPTIONS}
               disabled={locked}
-              onChange={(event) => setField('currency', event.target.value)}
-            >
-              {CURRENCIES.map((currency) => (
-                <option key={currency}>{currency}</option>
-              ))}
-            </select>
+              onChange={(value) => setField('currency', value)}
+            />
           </Field>
           <Field>
             <span>
@@ -189,17 +188,17 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
             />
             <FieldError id="issueDate-error" message={errors.issueDate} />
           </Field>
-          <Field>
-            Terms
-            <select
+          <Field as="div">
+            <label id={`${fieldId('paymentTerms')}-label`} htmlFor={fieldId('paymentTerms')}>
+              Terms
+            </label>
+            <Select
               id={fieldId('paymentTerms')}
+              aria-labelledby={`${fieldId('paymentTerms')}-label`}
               value={values.paymentTerms}
-              onChange={(event) => setField('paymentTerms', event.target.value as PaymentTerms)}
-            >
-              {PAYMENT_TERMS.map((terms) => (
-                <option key={terms}>{terms}</option>
-              ))}
-            </select>
+              options={TERMS_OPTIONS}
+              onChange={(value) => setField('paymentTerms', value)}
+            />
           </Field>
           <Field>
             <span>
@@ -297,5 +296,5 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
         )}
       </Footer>
     </Form>
-  )
-}
+  );
+};

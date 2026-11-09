@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 export const SkipLink = styled.a`
   position: absolute;
@@ -14,13 +14,13 @@ export const SkipLink = styled.a`
   &:focus {
     top: 12px;
   }
-`
+`;
 
 export const Shell = styled.div`
   min-height: 100vh;
   display: flex;
   flex-wrap: wrap;
-`
+`;
 
 export const Sidebar = styled.aside`
   flex: 1 1 ${({ theme }) => theme.layout.sidebarWidth};
@@ -35,14 +35,14 @@ export const Sidebar = styled.aside`
   @media (min-width: 900px) {
     flex: 0 0 ${({ theme }) => theme.layout.sidebarWidth};
   }
-`
+`;
 
 export const Workspace = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 4px 8px;
-`
+`;
 
 export const WorkspaceMark = styled.span`
   width: 28px;
@@ -53,7 +53,7 @@ export const WorkspaceMark = styled.span`
   display: grid;
   place-items: center;
   font-weight: 700;
-`
+`;
 
 export const WorkspaceName = styled.span`
   display: flex;
@@ -65,7 +65,7 @@ export const WorkspaceName = styled.span`
     font-size: ${({ theme }) => theme.font.size.xs};
     color: ${({ theme }) => theme.color.textMuted};
   }
-`
+`;
 
 export const NavList = styled.ul`
   list-style: none;
@@ -74,17 +74,21 @@ export const NavList = styled.ul`
   display: flex;
   flex-direction: column;
   gap: 2px;
-`
+`;
 
 export const NavGroupLabel = styled.span`
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 8px 10px;
   font-weight: 600;
-`
+`;
 
 export const NavLink = styled.a<{ $active?: boolean; $nested?: boolean }>`
-  display: block;
-  padding: ${({ $nested }) => ($nested ? '6px 10px 6px 24px' : '8px 10px')};
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: ${({ $nested }) => ($nested ? '6px 10px 6px 36px' : '8px 10px')};
   border-radius: ${({ theme }) => theme.radius.sm};
   color: ${({ theme, $active }) => ($active ? theme.color.text : theme.color.textSecondary)};
   background: ${({ $active }) => ($active ? '#EAEAE6' : 'transparent')};
@@ -94,14 +98,26 @@ export const NavLink = styled.a<{ $active?: boolean; $nested?: boolean }>`
   &:hover {
     background: #eeeeea;
   }
-`
+`;
+
+// demo-only sections, same layout as a link but plain text with no hover or pointer
+export const NavStatic = styled.span<{ $nested?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: ${({ $nested }) => ($nested ? '6px 10px 6px 36px' : '8px 10px')};
+  border-radius: ${({ theme }) => theme.radius.sm};
+  color: ${({ theme }) => theme.color.textSecondary};
+  cursor: default;
+  user-select: none;
+`;
 
 export const Main = styled.div`
   flex: 999 1 640px;
   min-width: 0;
   display: flex;
   flex-direction: column;
-`
+`;
 
 export const TopBar = styled.header`
   display: flex;
@@ -111,7 +127,7 @@ export const TopBar = styled.header`
   gap: 12px;
   padding: 12px ${({ theme }) => theme.layout.gutter};
   border-bottom: 1px solid ${({ theme }) => theme.color.border};
-`
+`;
 
 export const Breadcrumbs = styled.ol`
   list-style: none;
@@ -131,7 +147,19 @@ export const Breadcrumbs = styled.ol`
     color: ${({ theme }) => theme.color.text};
     font-weight: 500;
   }
-`
+`;
+
+export const BreadcrumbLink = styled.a`
+  color: inherit;
+  text-decoration: none;
+  border-radius: 3px;
+
+  &:hover {
+    color: ${({ theme }) => theme.color.text};
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+`;
 
 export const TopBarMeta = styled.div`
   display: flex;
@@ -139,7 +167,7 @@ export const TopBarMeta = styled.div`
   gap: 12px;
   font-size: ${({ theme }) => theme.font.size.sm};
   color: ${({ theme }) => theme.color.textMuted};
-`
+`;
 
 export const Avatar = styled.span`
   width: 28px;
@@ -151,7 +179,7 @@ export const Avatar = styled.span`
   place-items: center;
   font-size: ${({ theme }) => theme.font.size.xs};
   font-weight: 600;
-`
+`;
 
 export const Content = styled.main`
   outline: none;
@@ -160,4 +188,4 @@ export const Content = styled.main`
   @media (max-width: 600px) {
     padding: 16px 16px 40px;
   }
-`
+`;

@@ -1,7 +1,7 @@
-import type { AppMeta, DraftExample, DraftResult, Invoice, InvoiceInput } from '../types/invoice'
-import { request } from './http'
+import type { AppMeta, DraftExample, DraftResult, Invoice, InvoiceInput } from '../types/invoice';
+import { request } from './http';
 
-const invoicePath = (id: string) => `/api/invoices/${encodeURIComponent(id)}`
+const invoicePath = (id: string) => `/api/invoices/${encodeURIComponent(id)}`;
 
 export const invoicesApi = {
   meta: () => request<AppMeta>('/api/meta'),
@@ -29,4 +29,4 @@ export const invoicesApi = {
   // parses a plain text billing request into form values, nothing is saved
   draftFromText: (text: string) =>
     request<DraftResult>('/api/invoices/draft-from-text', { method: 'POST', body: JSON.stringify({ text }) }),
-}
+};
