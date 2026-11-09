@@ -15,6 +15,7 @@ import {
   NavStatic,
   Shell,
   Sidebar,
+  SidebarFooter,
   SkipLink,
   TopBar,
   TopBarMeta,
@@ -33,13 +34,15 @@ interface AppShellProp {
   companyName: string;
   asOfDate: string;
   breadcrumbs: Breadcrumb[];
+  // which sidebar link is the current page
+  section: 'invoices' | 'docs';
   children: ReactNode;
 }
 
 // these sections aren't built yet, they show the full navigation for the demo but aren't clickable
-const RECEIVABLE_PAGES = ['Customers', 'Contracts', 'Invoices', 'Credit memos', 'AR aging'];
+const RECEIVABLE_PAGES = ['Customers', 'Contracts', 'Invoices', 'Credit Memos', 'AR Aging'];
 
-export const AppShell = ({ companyName, asOfDate, breadcrumbs, children }: AppShellProp) => (
+export const AppShell = ({ companyName, asOfDate, breadcrumbs, section, children }: AppShellProp) => (
   <Shell>
     <SkipLink
       href="#main"
@@ -70,19 +73,24 @@ export const AppShell = ({ companyName, asOfDate, breadcrumbs, children }: AppSh
           <li>
             <NavStatic>
               <Icon name="ledger" />
-              General ledger
+              General Ledger
             </NavStatic>
           </li>
           <li>
             <NavGroupLabel>
               <Icon name="receivable" />
-              Accounts receivable
+              Accounts Receivable
             </NavGroupLabel>
             <NavList>
               {RECEIVABLE_PAGES.map((page) =>
                 page === 'Invoices' ? (
                   <li key={page}>
-                    <NavLink $nested $active aria-current="page" href={`#${paths.list()}`}>
+                    <NavLink
+                      $nested
+                      $active={section === 'invoices'}
+                      aria-current={section === 'invoices' ? 'page' : undefined}
+                      href={`#${paths.list()}`}
+                    >
                       Invoices
                     </NavLink>
                   </li>
@@ -97,7 +105,7 @@ export const AppShell = ({ companyName, asOfDate, breadcrumbs, children }: AppSh
           <li>
             <NavStatic>
               <Icon name="payable" />
-              Accounts payable
+              Accounts Payable
             </NavStatic>
           </li>
           <li>
@@ -108,6 +116,12 @@ export const AppShell = ({ companyName, asOfDate, breadcrumbs, children }: AppSh
           </li>
         </NavList>
       </nav>
+      <SidebarFooter aria-label="Help">
+        <NavLink $active={section === 'docs'} aria-current={section === 'docs' ? 'page' : undefined} href={`#${paths.docs()}`}>
+          <Icon name="book" />
+          Documentation
+        </NavLink>
+      </SidebarFooter>
     </Sidebar>
 
     <Main>

@@ -101,7 +101,7 @@ export const InvoiceForm = ({ invoice, initialValues, customers, onSaved, onCanc
           </Subtitle>
         </div>
         {!invoice && !draftOpen && (
-          <Button variant="secondary" onClick={() => setDraftOpen(true)}>
+          <Button variant="ghost" onClick={() => setDraftOpen(true)}>
             <Icon name="sparkle" size={15} />
             Draft from text instead
           </Button>

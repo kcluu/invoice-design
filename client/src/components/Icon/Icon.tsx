@@ -7,6 +7,7 @@ const ICON_PATHS = {
   receivable: 'M7 3h8l4 4v14H7zM15 3v4h4M10 12h6M10 16h6',
   payable: 'M4 7h16v12H4zM4 11h16M8 15h3',
   reports: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
+  book: 'M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5zM5 19.5A1.5 1.5 0 0 0 6.5 21H19M9 7h6',
   check: 'M5 12.5l4.5 4.5L19 7.5',
   chevronDown: 'M6 9l6 6 6-6',
   download: 'M12 4v11M7 10l5 5 5-5M5 20h14',
@@ -15,6 +16,8 @@ const ICON_PATHS = {
 };
 
 export type IconName = keyof typeof ICON_PATHS;
+
+export const ICON_NAMES = Object.keys(ICON_PATHS) as IconName[];
 
 interface IconProp {
   name: IconName;

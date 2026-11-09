@@ -89,7 +89,7 @@ export const toDraftResult = (llm: LlmDraft, { invoices, asOfDate }: DraftContex
   const filled = new Set<keyof InvoiceInput>(llm.statedFields);
 
   const customerName = invoices.find((invoice) => invoice.customerName.toLowerCase() === llm.customerName?.toLowerCase())?.customerName;
-  if (llm.customerName && !customerName) needsReview.push(`“${llm.customerName}” isn\'t a known customer. Pick one before saving.`);
+  if (llm.customerName && !customerName) needsReview.push(`"${llm.customerName}" isn\'t a known customer. Pick one before saving.`);
   if (!customerName) filled.delete('customerName');
   const previous = customerName
     ? invoices.filter((invoice) => invoice.customerName === customerName).sort((a, b) => b.issueDate.localeCompare(a.issueDate))[0]
@@ -101,7 +101,7 @@ export const toDraftResult = (llm: LlmDraft, { invoices, asOfDate }: DraftContex
   if (llm.dueDate && isIsoDate(llm.dueDate) && llm.dueDate >= issueDate) {
     dueDate = llm.dueDate;
   } else if (llm.dueDate) {
-    needsReview.push(`The requested due date “${llm.dueDate}” isn\'t valid, so it was set from ${paymentTerms} terms.`);
+    needsReview.push(`The requested due date "${llm.dueDate}" isn\'t valid, so it was set from ${paymentTerms} terms.`);
   }
 
   const draft: InvoiceInput = {

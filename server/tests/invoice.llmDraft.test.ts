@@ -43,7 +43,7 @@ describe('toDraftResult', () => {
 
     expect(draft.customerName).toBe('');
     expect(filledFields).not.toContain('customerName');
-    expect(needsReview).toContain("“Globex” isn't a known customer. Pick one before saving.");
+    expect(needsReview).toContain(`"Globex" isn't a known customer. Pick one before saving.`);
   });
 
   it("keeps the model's review notes and ignores an invalid due date", () => {

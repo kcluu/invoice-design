@@ -39,10 +39,11 @@ export const Row = styled.tr`
   }
 `;
 
-export const Td = styled.td<{ $align?: 'left' | 'right' }>`
+// two-line cells read best top-aligned, single items like the status pill sit in the middle
+export const Td = styled.td<{ $align?: 'left' | 'right'; $valign?: 'top' | 'middle' }>`
   padding: 12px;
   text-align: ${({ $align = 'left' }) => $align};
-  vertical-align: top;
+  vertical-align: ${({ $valign = 'top' }) => $valign};
   border-bottom: 1px solid ${({ theme }) => theme.color.divider};
 `;
 

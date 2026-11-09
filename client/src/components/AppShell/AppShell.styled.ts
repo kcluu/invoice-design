@@ -34,7 +34,19 @@ export const Sidebar = styled.aside`
 
   @media (min-width: 900px) {
     flex: 0 0 ${({ theme }) => theme.layout.sidebarWidth};
+    /* stays in view on long pages so the documentation link is always in the corner */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
   }
+`;
+
+// pinned to the bottom of the sidebar
+export const SidebarFooter = styled.nav`
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid ${({ theme }) => theme.color.border};
 `;
 
 export const Workspace = styled.div`

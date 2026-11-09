@@ -66,7 +66,7 @@ export const InvoiceListPage = ({
   const [deleting, setDeleting] = useState<Invoice | null>(null);
   const focus = filter === 'outstanding' || filter === 'dueSoon' ? FOCUS_NOTES[filter] : null;
   const viewLabel = focus?.label ?? STATUS_TABS.find((tab) => tab.value === filter)?.label ?? 'All';
-  const caption = `Invoices, ${viewLabel.toLowerCase()} view, ${visible.length} shown${query ? ` matching “${query}”` : ''}`;
+  const caption = `Invoices, ${viewLabel.toLowerCase()} view, ${visible.length} shown${query ? ` matching "${query}"` : ''}`;
   const currencies = [...new Set(invoices.map((invoice) => invoice.currency))].join(', ');
 
   const confirmDelete = async () => {

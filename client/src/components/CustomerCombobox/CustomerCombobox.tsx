@@ -118,7 +118,7 @@ export const CustomerCombobox = ({ id, value, customers, onChange, disabled, ...
         ))}
       </Listbox>
       {showList && !options.length && (
-        <Empty role="status">No saved customer matches. “{value.trim()}” will be saved as a new customer.</Empty>
+        <Empty role="status">No saved customer matches. "{value.trim()}" will be saved as a new customer.</Empty>
       )}
     </Wrap>
   );

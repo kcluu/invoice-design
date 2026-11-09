@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export type Route = { name: 'list' } | { name: 'new'; fromText?: boolean } | { name: 'detail'; id: string } | { name: 'edit'; id: string };
+export type Route =
+  { name: 'list' } | { name: 'docs' } | { name: 'new'; fromText?: boolean } | { name: 'detail'; id: string } | { name: 'edit'; id: string };
 
 export const paths = {
   list: () => '/invoices',
@@ -8,10 +9,12 @@ export const paths = {
   newFromText: () => '/invoices/new/text',
   detail: (id: string) => `/invoices/${encodeURIComponent(id)}`,
   edit: (id: string) => `/invoices/${encodeURIComponent(id)}/edit`,
+  docs: () => '/docs',
 };
 
 export const parseRoute = (hash: string): Route => {
   const [section, id, action] = hash.replace(/^#/, '').split('/').filter(Boolean);
+  if (section === 'docs') return { name: 'docs' };
   if (section !== 'invoices' || !id) return { name: 'list' };
   if (id === 'new') return action === 'text' ? { name: 'new', fromText: true } : { name: 'new' };
   const decoded = decodeURIComponent(id);

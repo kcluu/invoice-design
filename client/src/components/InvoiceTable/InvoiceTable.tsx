@@ -78,7 +78,7 @@ export const InvoiceTable = ({ invoices, asOfDate, caption, onOpen, onEdit, onAc
                   )}
                   <Secondary>{due.detail}</Secondary>
                 </Td>
-                <Td>
+                <Td $valign="middle">
                   <StatusBadge status={displayStatus(invoice)} />
                 </Td>
                 <Td $align="right">

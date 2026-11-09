@@ -1,5 +1,6 @@
 import { useMemo, type ReactNode } from 'react';
 import { AppShell, type Breadcrumb } from './components/AppShell/AppShell';
+import { DesignSystemPage } from './components/DesignSystemPage/DesignSystemPage';
 import { Toast } from './components/Toast/Toast';
 import { InvoiceDetailPage } from './components/InvoiceDetailPage/InvoiceDetailPage';
 import { InvoiceFormPage } from './components/InvoiceFormPage/InvoiceFormPage';
@@ -31,10 +32,17 @@ export const App = () => {
 
   const numberFor = (id: string) => invoices.find((item) => item.id === id)?.invoiceNumber ?? id.toUpperCase();
   // accounts receivable has no page of its own yet, so only invoices links back
-  const breadcrumbs: Breadcrumb[] = [{ label: 'Accounts receivable' }, { label: 'Invoices', href: `#${paths.list()}` }];
+  const breadcrumbs: Breadcrumb[] =
+    route.name === 'docs'
+      ? [{ label: 'Documentation' }]
+      : [{ label: 'Accounts Receivable' }, { label: 'Invoices', href: `#${paths.list()}` }];
   let page: ReactNode;
 
   switch (route.name) {
+    case 'docs':
+      breadcrumbs.push({ label: 'Design System' });
+      page = <DesignSystemPage />;
+      break;
     case 'new':
       breadcrumbs.push({ label: 'New invoice' });
       page = (
@@ -94,7 +102,12 @@ export const App = () => {
   }
 
   return (
-    <AppShell companyName={meta.companyName} asOfDate={meta.asOfDate} breadcrumbs={breadcrumbs}>
+    <AppShell
+      companyName={meta.companyName}
+      asOfDate={meta.asOfDate}
+      breadcrumbs={breadcrumbs}
+      section={route.name === 'docs' ? 'docs' : 'invoices'}
+    >
       {page}
       <Toast message={toast.message} onDismiss={toast.dismiss} />
     </AppShell>
