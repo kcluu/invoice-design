@@ -10,7 +10,7 @@ interface DraftFromTextProp {
 }
 
 export const DraftFromText = ({ onDraft }: DraftFromTextProp) => {
-  const { text, setText, status, error, needsReview, examples, run } = useDraftFromText({ onDraft });
+  const { text, setText, status, error, needsReview, examples, examplesLoading, run } = useDraftFromText({ onDraft });
   const headingId = useId();
   const inputId = useId();
   const drafting = status === 'drafting';
@@ -38,6 +38,11 @@ export const DraftFromText = ({ onDraft }: DraftFromTextProp) => {
       {error && <ErrorText id={`${inputId}-error`}>{error}</ErrorText>}
 
       <Row>
+        {examplesLoading && (
+          <Examples aria-busy="true">
+            <Skeleton width="300px" height={30} />
+          </Examples>
+        )}
         {examples.length > 0 && (
           <Examples>
             <span id={`${inputId}-examples`}>Try an example:</span>

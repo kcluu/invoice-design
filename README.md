@@ -35,16 +35,16 @@ Server tests use an in-memory repository and never call Claude, so they need no 
 
 The users are AR and finance staff. Their questions are "what's owed, what's late, what do I chase today", and their mistakes are costly, because a wrong invoice reaches a customer and the books. The design favors clarity and safe defaults over speed.
 
-- **The list answers the triage question first.** Summary cards for outstanding, overdue, due in the next 14 days and drafts double as filters. The due column says "12 days overdue" or "Due in 9 days" rather than a bare date, and is coloured by urgency.
-- **Status is unambiguous.** Each status pill differs in shape as well as colour, so it doesn't rely on colour alone. Draft is a dashed outline (not issued yet) and Void is filled gray (closed). A banner on the detail page says what state the invoice is in and what to do next.
+- **The list answers the triage question first.** Summary cards for outstanding, overdue, due in the next 14 days and drafts double as filters. The due column says "12 days overdue" or "Due in 9 days" rather than a bare date, and is colored by urgency for easy attention to important invoices.
+- **Status is unambiguous.** Each status pill differs in shape as well as color, so it doesn't rely on color alone. Draft is a dashed outline (not issued yet) and Void is filled gray (closed). A banner on the detail page says what state the invoice is in and what to do next.
 - **The lifecycle follows accounting rules.** Draft → Sent (Open or Overdue) → Paid, or Sent → Void.
   - Only drafts can be deleted. Anything a customer has seen is voided instead, so it stays on record with its history and the invoice numbers have no gaps.
   - Once an invoice is sent, the customer, money and line items are locked. Only the dates, terms and memo can change.
   - Sending re-dates a draft to the send day, so the customer gets their full terms.
-- **Actions only appear when they're valid.** Menus show only the actions the status allows and explain missing ones ("Sent invoices can't be deleted. Void it instead."). The server enforces the same rules.
-- **Data entry is forgiving.** Picking a customer fills in their usual email, address, currency, terms and tax. The due date follows the terms until it's set by hand. Errors show next to each field and in a summary.
-- **AI drafts, a person decides.** Draft from text only fills the form. Anything inferred, copied from history or ambiguous is listed under "Check these before sending", and nothing is saved until someone reviews it.
-- **Built to be accessible:** keyboard support throughout (menu button, select and combobox patterns, a focus-trapped delete dialog, a skip link), announcements through live regions, and WCAG AA contrast.
+- **Actions only appear when they're valid.** Menus show only the actions the status allows and explain missing ones so users can self-serve themselves ("Sent invoices can't be deleted. Void it instead."). Rather than disabled button states.
+- **Data entry is forgiving.** Picking a customer autofills in their usual email, address, currency, terms and tax for increased input speed. The due date follows the terms until it's set by hand. Errors show next to each field and in a summary.
+- **AI drafts, a person decides.** Draft from text only fills the form. Anything inferred, copied from history or ambiguous is listed under "Check these before sending", and nothing is saved until someone reviews it ensuring data integrity.
+- **Built to be accessible:** keyboard support throughout (menu button, select and combobox patterns, a focus-trapped delete dialog, a skip link).
 
 ## Technical decisions
 
@@ -52,9 +52,9 @@ The users are AR and finance staff. Their questions are "what's owed, what's lat
 
 - **Postgres, one `invoices` table.** Line items and the activity log are `jsonb` columns on the row. An invoice is always read and written as a whole, so this keeps it to one query per read and matches the seed file's shape.
 - **Constraints in two places.**
-  - Postgres enforces the basics: status values, terms, memo length, `due_date >= issue_date`, and tax between 0 and 1.
-  - zod validates everything else before a write, and failures come back as `422 { error, fields }`, with each field error shown next to its input.
-- **Derived values are never stored.** Overdue is derived from the status and due date on every read, so it never goes stale. Totals are always recalculated from line items, discount and tax.
+  - Postgres enforces the basics: status values, terms, memo length, `due_date >= issue_date`, and tax between 0 and 1 (percentage as decimal).
+  - zod validates everything else before a write, and failures come back with each field error shown next to its input.
+- **Derived values are recalculated, not trusted.** Open vs Overdue is recalculated from the status and due date every time an invoice is returned, so a stale stored `payment_status` never reaches the client and no scheduled job is needed. Totals aren't stored at all and are always calculated from line items, discount and tax.
 - **The repository is behind an interface.** It has a Postgres version for the app and an in-memory version for tests. Lifecycle rules live in the service layer (`invoice.service.ts`).
 
 ### LLM-enhanced drafting
@@ -62,12 +62,12 @@ The users are AR and finance staff. Their questions are "what's owed, what's lat
 `POST /api/invoices/draft-from-text` takes `{ text }` and returns `{ draft, needsReview, filledFields }`. Nothing is saved.
 
 - **Server only.** The Anthropic API key is read from `server/.env` and never reaches the browser.
-- **Structured output.** `invoice.llmDraft.ts` calls Claude (`claude-opus-5-5`) with a zod schema, so the response is guaranteed to match. The prompt includes known customers with their recent terms, discounts, line items and account codes, so Claude can resolve common references like "the usual discount" or "same rate as last time".
+- **Structured output.** `invoice.llmDraft.ts` calls Claude (`claude-opus-5-5`) with a zod schema, so the response is guaranteed to match. The prompt includes known customers with their recent terms, discounts, line items and account codes, so Claude can resolve common references like "the usual discount" or "same rate as last time", for example.
 - **The model extracts; the server decides.**
   - Fields that weren't stated come back as `null`, not guesses.
   - The server matches the customer against real records, fills gaps from that customer's history, calculates the due date from the terms and validates the result.
   - Its own checks (an unknown customer, no line items, validation errors) are added to the model's review notes.
-- **Prompt injection.** The request text is wrapped in `<request>` tags, and the prompt treats it as data, not instructions.
+- **Prompt injection.** The request text is wrapped in `<request>` tags, and the prompt treats it as data vs instructions.
 - **Fallback.** If there's no API key, or the call fails, is refused or returns bad output, the rule-based drafter (`invoice.draftFromText.ts`) runs instead and flags that AI drafting wasn't available. Both drafters return the same result shape.
 
 ### Frontend
@@ -84,15 +84,15 @@ The users are AR and finance staff. Their questions are "what's owed, what's lat
 - **Sidebar navigation.** Only Invoices and Documentation work. The other sections are static, there to show what the full accounting software would feel like.
 - **Download PDF.** Shows a "(prototype)" confirmation, but no file is generated. I kept it because it completes the flow of viewing an invoice.
 - **Comments.** Interactive but local only. They aren't saved to the database and reset on reload.
-- **Delete vs void permissions.** With limited accounting knowledge, I debated whether delete should be allowed on anything unpaid or only on drafts. I went with drafts only, so anything a customer has seen stays on record. A finance team should confirm the rule.
-- **Error summary navigation.** Errors show in a summary and next to each field, but entries in the summary don't jump to or highlight their field.
-- **Search and filtering at scale.** The client loads every invoice once and searches, filters and totals them in the browser. That's instant for a few hundred invoices but won't hold up for large volumes. Search would become its own query on the server (e.g. `GET /api/invoices?q=acme&status=Overdue&page=2`) backed by database indexes, with paginated results, and the summary card totals would come from a separate aggregate query.
-- **Design system page.** It covers tokens, status, banners, buttons and icons. Next I'd add the shared form components (Select, CustomerCombobox, inputs) and their error and disabled states.
+- **Delete vs void permissions.** With limited accounting knowledge, I debated whether delete should be allowed on anything unpaid or only on drafts. I went with drafts only, so anything a customer has seen stays on record. A finance team should confirm the rule though.
+- **Error summary navigation.** Errors show in a summary and next to each field, but ideally entries in the summary should jump to or highlight their field.
+- **Search and filtering at scale.** The client loads every invoice once and searches, filters and totals them in the browser. That's instant for a few hundred invoices but is not scalable. Ideally, Search would become its own query on the server (e.g. `GET /api/invoices?q=acme&status=Overdue&page=2`) backed by database indexes, with paginated results, and the summary card totals would come from a separate aggregate query.
+- **Design system page.** It covers tokens, status, banners, buttons and icons. But next I'd add the shared form components (Select, CustomerCombobox, inputs) and their error and disabled states.
 
 ### Workarounds
 
 - **Placeholder revenue accounts.** The account codes and names (`4000 Subscription`, `4010 Usage`, …) are inferred from the seed data. They should be replaced with the company's real GL revenue accounts, which I'd expect to come from the accounting team.
-- **Customers come from past invoices.** There's no customers table, so picking a customer fills in the email, address, currency, terms and tax rate from their most recent invoice. That means a typo on a voided or draft invoice can become the "usual" value, names must match exactly, and the list only knows about invoices already loaded. A real customers table, with invoices pointing to a customer ID, would fix all three.
+- **Customers come from past invoices.** There's no customers table, so picking a customer fills in the email, address, currency, terms and tax rate from their most recent invoice. That means a typo on a voided or draft invoice can become the "usual/autofilled" value, names must match exactly, and the list only knows about invoices already loaded. A real customers table, with invoices pointing to a customer ID, would fix all three.
 - **Fixed "today".** Due dates and overdue status are measured from a fixed `AS_OF_DATE` (May 4, 2026, from the seed data) instead of the real date, so the sample invoices keep a realistic mix of statuses.
 - **Validation in two places.** The client and server each have their own copy of the validation rules instead of a shared package, so changing a rule means updating both.
 

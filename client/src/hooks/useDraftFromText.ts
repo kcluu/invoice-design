@@ -15,6 +15,7 @@ export const useDraftFromText = ({ onDraft }: UseDraftFromTextOptions) => {
   const [error, setError] = useState<string | null>(null);
   const [needsReview, setNeedsReview] = useState<string[]>([]);
   const [examples, setExamples] = useState<DraftExample[]>([]);
+  const [examplesLoading, setExamplesLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -25,6 +26,9 @@ export const useDraftFromText = ({ onDraft }: UseDraftFromTextOptions) => {
       })
       .catch(() => {
         // examples are a nice to have, the panel works without them
+      })
+      .finally(() => {
+        if (active) setExamplesLoading(false);
       });
     return () => {
       active = false;
@@ -56,5 +60,5 @@ export const useDraftFromText = ({ onDraft }: UseDraftFromTextOptions) => {
     [text, onDraft]
   );
 
-  return { text, setText, status, error, needsReview, examples, run };
+  return { text, setText, status, error, needsReview, examples, examplesLoading, run };
 };
